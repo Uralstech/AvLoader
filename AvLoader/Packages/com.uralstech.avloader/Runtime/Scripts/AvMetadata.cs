@@ -32,22 +32,34 @@ namespace Uralstech.AvLoader
     public struct AvMetadata
     {
         /// <summary>
+        /// Unique ID of the avatar.
+        /// </summary>
+        [JsonProperty("id")]
+        public string Id;
+
+        /// <summary>
         /// The type of the model.
         /// </summary>
-        [JsonProperty("bodyType"),  JsonConverter(typeof(StringEnumConverter))]
+        [JsonProperty("bodyType"), JsonConverter(typeof(StringEnumConverter))]
         public AvType Type;
 
         /// <summary>
         /// The gender of the model or outfit it is wearing.
         /// </summary>
-        [JsonProperty("outfitGender")]
+        [JsonProperty("outfitGender"), JsonConverter(typeof(StringEnumConverter))]
         public AvGender Gender;
+
+        /// <summary>
+        /// The creation timestamp of the model.
+        /// </summary>
+        [JsonProperty("createdAt")]
+        public DateTimeOffset CreatedAt;
 
         /// <summary>
         /// The last time this model was updated.
         /// </summary>
         [JsonProperty("updatedAt")]
-        public DateTimeOffset LastUpdate;
+        public DateTimeOffset UpdatedAt;
 
         /// <summary>
         /// The skin tone of the model stored as a hex string (including the #).

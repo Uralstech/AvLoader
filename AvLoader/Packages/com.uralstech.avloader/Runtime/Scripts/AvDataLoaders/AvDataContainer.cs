@@ -29,7 +29,7 @@ namespace Uralstech.AvLoader
         /// <summary>The file format of the model.</summary>
         public readonly AvModelFileExtension ModelFormat;
 
-        /// <summary>Path to model if it is in local storage.</summary>
+        /// <summary>Path to model, if in local storage.</summary>
         public readonly string? LocalModelPath;
 
         /// <summary>Metadata of the avatar.</summary>
