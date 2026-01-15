@@ -10,7 +10,7 @@
         }
       ],
       "properties": {
-        "DefineConstants": "GLTFAST_INSTALLED;ANIMATION_INSTALLED"
+        "DefineConstants": "GLTFAST_INSTALLED;UNIVRM10_INSTALLED;UNIGLTF_INSTALLED;ANIMATION_INSTALLED"
       },
       "dest": "api",
       "filter": "filterConfig.yml",

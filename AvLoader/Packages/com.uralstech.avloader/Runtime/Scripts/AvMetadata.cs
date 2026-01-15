@@ -65,7 +65,7 @@ namespace Uralstech.AvLoader
         /// The skin tone of the model stored as a hex string (including the #).
         /// </summary>
         [JsonProperty("skinTone")]
-        public string SkinTone;
+        public string? SkinTone;
 
         /// <summary>
         /// Tries creating a <see cref="AvMetadata"/> struct from raw bytes.

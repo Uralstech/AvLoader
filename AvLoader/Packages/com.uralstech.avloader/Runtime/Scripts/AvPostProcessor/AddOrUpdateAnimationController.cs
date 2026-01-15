@@ -19,23 +19,34 @@ using UnityEngine;
 namespace Uralstech.AvLoader
 {
     /// <summary>
-    /// Post-processing step which adds an animation controller to the loaded avatar.
+    /// Post-processing step which adds or updates an animation controller in the loaded avatar.
     /// Requries Unity's animation module to be enabled.
     /// </summary>
-    public class AddAnimationController : IAvPostProcessor
+    public class AddOrUpdateAnimationController : IAvPostProcessor
     {
         /// <summary>Runtime animator controller to assign to the loaded avatar.</summary>
         public RuntimeAnimatorController? AnimatorController;
 
-        /// <summary>Animation avatar to assign to the loaded avatar.</summary>
+        /// <summary>
+        /// Animation avatar to assign to the loaded avatar.
+        /// </summary>
+        /// <remarks>
+        /// If the avatar already has an animator, this won't be assigned unless <see cref="OverrideAvatar"/> is <see langword="true"/>.
+        /// </remarks>
         public Avatar? Avatar;
+
+        /// <summary>If the avatar already has an animation avatar assigned, should it be overridden?</summary>
+        public bool OverrideAvatar;
 
         /// <inheritdoc/>
         public void PostProcess(LoadedAv avatar, AvDataContainer _)
         {
-            Animator animator = avatar.GameObject.AddComponent<Animator>();
-            animator.runtimeAnimatorController = AnimatorController;
-            animator.avatar = Avatar;
+            if (!avatar.GameObject.TryGetComponent(out Animator animator))
+                animator = avatar.GameObject.AddComponent<Animator>();
+            
+            animator.runtimeAnimatorController = AnimatorController;        
+            if (animator.avatar == null || OverrideAvatar)
+                animator.avatar = Avatar;
         }
     }
 }

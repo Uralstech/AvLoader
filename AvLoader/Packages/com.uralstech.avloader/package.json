@@ -1,7 +1,7 @@
 {
   "name": "com.uralstech.avloader",
   "displayName": "AvLoader",
-  "description": "Unity framework for loading 3D avatars of different formats and sources at runtime, currently supports glTF.",
+  "description": "Unity framework for loading 3D avatars of different formats and sources at runtime, currently supports glTF and VRM.",
   "keywords": [],
   "version": "1.0.0-preview.1",
   "unity": "6000.0",

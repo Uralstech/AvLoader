@@ -90,7 +90,7 @@ namespace Uralstech.AvLoader
                 return null;
             }
 
-            return new LoadedGLTFAv(
+            return new LoadedGLTFastAv(
                 gameObject, import, rawData.Metadata,
                 rawData.FullRender, rawData.BustRender,
                 typeof(GLTFastAvImporter)
@@ -119,15 +119,15 @@ namespace Uralstech.AvLoader
     }
 
     /// <summary>
-    /// A loaded glTF avatar.
+    /// A loaded glTFast glTF avatar.
     /// </summary>
-    public class LoadedGLTFAv : LoadedAv
+    public class LoadedGLTFastAv : LoadedAv
     {
         /// <summary>The glTFast import associated with the avatar.</summary>
         public readonly GltfImport Import;
         private bool _disposed = false;
 
-        public LoadedGLTFAv(GameObject gameObject, GltfImport import, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
+        public LoadedGLTFastAv(GameObject gameObject, GltfImport import, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
             : base(gameObject, metadata, fullRender, bustRender, importerType)
         {
             Import = import;
