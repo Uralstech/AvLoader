@@ -864,7 +864,7 @@ PlayerSettings:
   editorAssembliesCompatibilityLevel: 1
   m_RenderingPath: 1
   m_MobileRenderingPath: 1
-  metroPackageName: PackageTemplate
+  metroAvLoader: PackageTemplate
   metroPackageVersion: 
   metroCertificatePath: 
   metroCertificatePassword: 

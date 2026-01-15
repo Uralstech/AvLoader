@@ -85,9 +85,9 @@ csharp_style_expression_bodied_accessors = true:warning
 csharp_style_expression_bodied_constructors = false:warning
 csharp_style_expression_bodied_indexers = true:warning
 csharp_style_expression_bodied_lambdas = true:warning
-csharp_style_expression_bodied_local_functions = false:warning
-csharp_style_expression_bodied_methods = false:warning
-csharp_style_expression_bodied_operators = false:warning
+csharp_style_expression_bodied_local_functions = when_on_single_line:warning
+csharp_style_expression_bodied_methods = when_on_single_line:warning
+csharp_style_expression_bodied_operators = when_on_single_line:warning
 csharp_style_expression_bodied_properties = true:warning
 
 # Pattern matching preferences
@@ -138,7 +138,7 @@ csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimenta
 csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = true:silent
 csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = false:silent
 csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false:silent
-csharp_style_allow_embedded_statements_on_same_line_experimental = false:warning
+csharp_style_allow_embedded_statements_on_same_line_experimental = false:none
 
 #### C# Formatting Rules ####
 
