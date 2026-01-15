@@ -1,0 +1,27 @@
+{
+  "name": "com.uralstech.avloader",
+  "displayName": "AvLoader",
+  "description": "Unity framework for loading 3D avatars of different formats and sources at runtime, currently supports glTF.",
+  "keywords": [],
+  "version": "1.0.0-preview.1",
+  "unity": "6000.0",
+  "hideInEditor": false,
+  "documentationUrl": "https://uralstech.github.io/AvLoader/",
+  "changelogUrl": "https://github.com/Uralstech/AvLoader/releases",
+  "licensesUrl": "https://github.com/Uralstech/AvLoader/blob/master/LICENSE",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "repository": "https://github.com/Uralstech/AvLoader.git"
+  },
+  "author": {
+    "name": "Udayshankar Ravikumar",
+    "url": "https://github.com/Uralstech"
+  },
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.2.2",
+    "com.unity.modules.unitywebrequest": "1.0.0",
+    "com.unity.modules.unitywebrequesttexture": "1.0.0",
+    "com.unity.modules.imageconversion": "1.0.0"
+  }
+}
