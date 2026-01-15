@@ -9,6 +9,9 @@
           ]
         }
       ],
+      "properties": {
+        "DefineConstants": "GLTFAST_INSTALLED;ANIMATION_INSTALLED"
+      },
       "dest": "api",
       "filter": "filterConfig.yml",
       "includePrivateMembers": false,
