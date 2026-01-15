@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #if ANIMATION_INSTALLED
+using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
@@ -35,6 +36,15 @@ namespace Uralstech.AvLoader
         /// </remarks>
         public Avatar? Avatar;
 
+        /// <summary>
+        /// Lookup table for when you need to assign animation avatars
+        /// based on the avatar's gender. If not found here, falls back to <see cref="Avatar"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the avatar already has an animator, this won't be assigned unless <see cref="OverrideAvatar"/> is <see langword="true"/>.
+        /// </remarks>
+        public IReadOnlyDictionary<AvGender, Avatar>? AvGenderToAvatarLookup;
+
         /// <summary>If the avatar already has an animation avatar assigned, should it be overridden?</summary>
         public bool OverrideAvatar;
 
@@ -46,7 +56,7 @@ namespace Uralstech.AvLoader
             
             animator.runtimeAnimatorController = AnimatorController;        
             if (animator.avatar == null || OverrideAvatar)
-                animator.avatar = Avatar;
+                animator.avatar = AvGenderToAvatarLookup?.TryGetValue(avatar.Metadata.Gender, out Avatar animAvatar) == true ? animAvatar : Avatar;
         }
     }
 }

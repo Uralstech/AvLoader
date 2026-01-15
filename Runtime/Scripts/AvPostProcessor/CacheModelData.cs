@@ -32,7 +32,7 @@ namespace Uralstech.AvLoader
     /// For example, avatars loaded from OBJ files with external texture files
     /// will not work.
     /// </remarks>
-    public class CacheModelData : IAvAsyncPostProcessor
+    public class CacheModelData : IAsyncAvPostProcessor
     {
         /// <summary>
         /// The base directory to save the avatar to.

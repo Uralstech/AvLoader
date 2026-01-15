@@ -88,7 +88,7 @@ namespace Uralstech.AvLoader
     /// <summary>
     /// A simple script that can perform an asynchronous post-processing step on an imported avatar.
     /// </summary>
-    public interface IAvAsyncPostProcessor
+    public interface IAsyncAvPostProcessor
     {
         /// <summary>
         /// Runs a post-processing step on the given avatar.
