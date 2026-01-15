@@ -5,7 +5,10 @@ _layout: landing
 # AvLoader
 
 Unity framework for loading 3D avatars of different formats and sources at runtime, currently supports glTF.
+This package is actively under development and is currently released for source code reference only.
+The code may be used in accordance with the Apache 2.0 license, but it is highly unstable and subject to frequent breaking changes.
 
+<!---
 [![openupm](https://img.shields.io/npm/v/com.uralstech.avloader?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.uralstech.avloader/)
 [![openupm](https://img.shields.io/badge/dynamic/json?color=brightgreen&label=downloads&query=%24.downloads&suffix=%2Fmonth&url=https%3A%2F%2Fpackage.openupm.com%2Fdownloads%2Fpoint%2Flast-month%2Fcom.uralstech.avloader)](https://openupm.com/packages/com.uralstech.avloader/)
 
@@ -47,3 +50,4 @@ Do not use preview versions (i.e. versions that end with "-preview") for product
 ## Documentation
 
 See <https://uralstech.github.io/AvLoader/DocSource/QuickStart.html> or `APIReferenceManual.pdf` and `Documentation.pdf` in the package documentation for the reference manual and tutorial.
+-->
