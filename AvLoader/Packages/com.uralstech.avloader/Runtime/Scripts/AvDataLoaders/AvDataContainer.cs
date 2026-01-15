@@ -29,8 +29,8 @@ namespace Uralstech.AvLoader
         /// <summary>The file format of the model.</summary>
         public readonly AvModelFileExtension ModelFormat;
 
-        /// <summary>Path to model, if in local storage.</summary>
-        public readonly string? LocalModelPath;
+        /// <summary>The path/URI to model.</summary>
+        public readonly string? ModelPath;
 
         /// <summary>Metadata of the avatar.</summary>
         public readonly AvMetadata Metadata;
@@ -44,12 +44,12 @@ namespace Uralstech.AvLoader
         /// <summary>The type of the data loader which created this.</summary>
         public readonly Type DataLoaderType;
 
-        public AvDataContainer(byte[] model, AvModelFileExtension modelFormat, string? localModelPath, AvMetadata metadata,
+        public AvDataContainer(byte[] model, AvModelFileExtension modelFormat, string? modelPath, AvMetadata metadata,
             Type dataLoaderType, Texture2D? fullRender = null, Texture2D? bustRender = null)
         {
             Model = model;
             ModelFormat = modelFormat;
-            LocalModelPath = localModelPath;
+            ModelPath = modelPath;
             Metadata = metadata;
             DataLoaderType = dataLoaderType;
             FullRender = fullRender;

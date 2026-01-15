@@ -66,10 +66,10 @@ namespace Uralstech.AvLoader
         /// Runs the loader flow completely.
         /// </summary>
         /// <returns>The loaded avatar.</returns>
-        public async Awaitable<ILoadedAv> RunFlowAsync(CancellationToken token = default)
+        public async Awaitable<LoadedAv> RunFlowAsync(CancellationToken token = default)
         {
             AvDataContainer rawData = (await LoadAvatarDataAsync(true, token))!;
-            ILoadedAv avatar = (await ImportAvatarDataAsync(rawData, true, token))!;
+            LoadedAv avatar = (await ImportAvatarDataAsync(rawData, true, token))!;
             await RunPostProcessorsAndDisposeAvOnFailAsync(avatar, rawData, true, token);
 
             avatar.GameObject.SetActive(true);
@@ -80,12 +80,12 @@ namespace Uralstech.AvLoader
         /// Tries to run the loader flow completely.
         /// </summary>
         /// <returns>The loaded avatar if the entire flow completed successfully; <see langword="null"/> otherwise.</returns>
-        public async Awaitable<ILoadedAv?> TryRunFlowAsync(CancellationToken token = default)
+        public async Awaitable<LoadedAv?> TryRunFlowAsync(CancellationToken token = default)
         {
             AvDataContainer? rawData = await LoadAvatarDataAsync(false, token);
             if (rawData is null) return null;
 
-            ILoadedAv? avatar = await ImportAvatarDataAsync(rawData, true, token);
+            LoadedAv? avatar = await ImportAvatarDataAsync(rawData, true, token);
             if (avatar is null) return null;
 
             if (!await RunPostProcessorsAndDisposeAvOnFailAsync(avatar, rawData, true, token))
@@ -108,20 +108,20 @@ namespace Uralstech.AvLoader
             return null;
         }
 
-        private async Awaitable<ILoadedAv?> ImportAvatarDataAsync(AvDataContainer rawData, bool throwOnFinalFail, CancellationToken token)
+        private async Awaitable<LoadedAv?> ImportAvatarDataAsync(AvDataContainer rawData, bool throwOnFinalFail, CancellationToken token)
         {
             int counter = 0;
             int failAtIdx = Importers.Count - 1;
             foreach (IAvImporter importer in Importers)
             {
-                if (await importer.ImportAvatarAsync(rawData, throwOnFinalFail && counter == failAtIdx, token) is ILoadedAv avatar)
+                if (await importer.ImportAvatarAsync(rawData, throwOnFinalFail && counter == failAtIdx, token) is LoadedAv avatar)
                     return avatar;
             }
 
             return null;
         }
     
-        private async Awaitable<bool> RunPostProcessorsAndDisposeAvOnFailAsync(ILoadedAv avatar, AvDataContainer rawData, bool throwOnFail, CancellationToken token)
+        private async Awaitable<bool> RunPostProcessorsAndDisposeAvOnFailAsync(LoadedAv avatar, AvDataContainer rawData, bool throwOnFail, CancellationToken token)
         {
             try
             {

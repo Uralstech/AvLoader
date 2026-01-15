@@ -61,15 +61,15 @@ namespace Uralstech.AvLoader
         /// Tries to import the avatar into a scene as a disabled GameObject, along with metadata and any renders.
         /// </summary>
         /// <remarks>
-        /// The returned <see cref="ILoadedAv"/> may contain code to handle requirements of format-supporting plugins.
+        /// The returned <see cref="LoadedAv"/> may contain code to handle requirements of format-supporting plugins.
         /// For example, <see cref="GLTFAvImporter"/> depends on glTFast, which requires that GltfImport object used
         /// to import the avatar be active alongside the avatar's GameObject, and should be disposed after the avatar
-        /// is no longer needed. Thus, <see cref="ILoadedAv"/> implements <see cref="System.IDisposable"/>.
+        /// is no longer needed. Thus, <see cref="LoadedAv"/> implements <see cref="System.IDisposable"/>.
         /// </remarks>
         /// <param name="rawData">The raw avatar data to process.</param>
         /// <param name="throwOnFail">Should this method throw errors on failures or log them as warnings and return <see langword="null"/>?</param>
         /// <returns>The loaded avatar if successful; <see langword="null"/> on failure.</returns>
-        public Awaitable<ILoadedAv?> ImportAvatarAsync(AvDataContainer rawData, bool throwOnFail, CancellationToken token = default);
+        public Awaitable<LoadedAv?> ImportAvatarAsync(AvDataContainer rawData, bool throwOnFail, CancellationToken token = default);
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ namespace Uralstech.AvLoader
         /// </summary>
         /// <param name="avatar">The loaded avatar to process.</param>
         /// <param name="rawData">The raw data of the loaded avatar.</param>
-        public void PostProcess(ILoadedAv avatar, AvDataContainer rawData);
+        public void PostProcess(LoadedAv avatar, AvDataContainer rawData);
     }
 
     /// <summary>
@@ -95,6 +95,6 @@ namespace Uralstech.AvLoader
         /// </summary>
         /// <param name="avatar">The loaded avatar to process.</param>
         /// <param name="rawData">The raw data of the loaded avatar.</param>
-        public Awaitable PostProcessAsync(ILoadedAv avatar, AvDataContainer rawData, CancellationToken token = default);
+        public Awaitable PostProcessAsync(LoadedAv avatar, AvDataContainer rawData, CancellationToken token = default);
     }
 }

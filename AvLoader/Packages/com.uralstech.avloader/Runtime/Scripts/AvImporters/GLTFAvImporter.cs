@@ -17,6 +17,7 @@ using System;
 using System.IO;
 using System.Threading;
 using GLTFast;
+using GLTFast.Loading;
 using GLTFast.Logging;
 using GLTFast.Materials;
 using UnityEngine;
@@ -34,29 +35,22 @@ namespace Uralstech.AvLoader
         /// </summary>
         public Func<GltfImport, GameObject, Awaitable<GameObjectInstantiator>>? InstantiatorFactory;
 
-        /// <summary>
-        /// Optional custom glTFast InstantiationSettings.
-        /// </summary>
+        /// <summary>Optional custom glTFast InstantiationSettings.</summary>
         public InstantiationSettings? InstantiationSettings;
 
-        /// <summary>
-        /// Optional custom glTFast ImportSettings.
-        /// </summary>
+        /// <summary>Optional custom glTFast ImportSettings.</summary>
         public ImportSettings? ImportSettings;
 
-        /// <summary>
-        /// Optional custom glTFast defer agent.
-        /// </summary>
+        /// <summary>Optional custom glTFast download provider.</summary>
+        public IDownloadProvider? DownloadProvider;
+
+        /// <summary>Optional custom glTFast defer agent.</summary>
         public IDeferAgent? DeferAgent;
 
-        /// <summary>
-        /// Optional custom glTFast material generator.
-        /// </summary>
+        /// <summary>Optional custom glTFast material generator.</summary>
         public IMaterialGenerator? MaterialGenerator;
 
-        /// <summary>
-        /// Optional custom glTFast logger.
-        /// </summary>
+        /// <summary>Optional custom glTFast logger.</summary>
         public ICodeLogger? Logger;
 
         /// <inheritdoc/>
@@ -64,19 +58,12 @@ namespace Uralstech.AvLoader
             format is AvModelFileExtension.GLTF or AvModelFileExtension.GLB or AvModelFileExtension.GLTFAny;
 
         /// <inheritdoc/>
-        public async Awaitable<ILoadedAv?> ImportAvatarAsync(AvDataContainer rawData, bool throwOnFail, CancellationToken token = default)
+        public async Awaitable<LoadedAv?> ImportAvatarAsync(AvDataContainer rawData, bool throwOnFail, CancellationToken token = default)
         {
-            GltfImport import = new(
-                deferAgent: DeferAgent,
-                materialGenerator: MaterialGenerator,
-                logger: Logger
-            );
+            GltfImport import = new(DownloadProvider, DeferAgent, MaterialGenerator, Logger);
+            Uri? modelUri = !string.IsNullOrEmpty(rawData.ModelPath) ? new Uri(rawData.ModelPath) : null;
 
-            bool success = await import.Load(
-                rawData.Model, !string.IsNullOrEmpty(rawData.LocalModelPath) ? new Uri(rawData.LocalModelPath) : null,
-                ImportSettings, token
-            );
-
+            bool success = await import.Load(rawData.Model, modelUri, ImportSettings, token);
             if (!success)
             {
                 import.Dispose();
@@ -89,87 +76,65 @@ namespace Uralstech.AvLoader
             GameObject gameObject = new($"Avatar ({nameof(GLTFAvImporter)})");
             gameObject.SetActive(false);
 
-            GameObjectInstantiator instantiator;
-            if (InstantiatorFactory is not null)
-            {
-                try
-                {
-                    instantiator = await InstantiatorFactory(import, gameObject);
-                }
-                catch (Exception ex)
-                {
-                    import.Dispose();
-                    
-                    if (throwOnFail) throw new AggregateException("Could not create instantiator due to exception from user code.", ex);
-                    Debug.LogWarning($"{nameof(GLTFAvImporter)}: Could not create instantiator due to exception from user code:\n{ex}");
-                    return null;
-                }
-            }
-            else
-            {
-                instantiator = new GameObjectInstantiator(import, gameObject.transform, Logger, InstantiationSettings);
-            }
+            if (await GetGameObjectInstantiatorAndDisposeOnFail(import, gameObject, throwOnFail) is not GameObjectInstantiator instantiator)
+                return null;
 
             success = await import.InstantiateMainSceneAsync(instantiator, token);
             if (!success)
             {
                 import.Dispose();
+                UnityEngine.Object.Destroy(gameObject);
+
                 if (throwOnFail) throw new InvalidDataException("Could not import glTF main scene.");
-                
                 Debug.LogWarning($"{nameof(GLTFAvImporter)}: Could not import glTF main scene.");
                 return null;
             }
 
             return new LoadedGLTFAv(
                 gameObject, import, rawData.Metadata,
-                rawData, typeof(GLTFAvImporter),
-                rawData.FullRender, rawData.BustRender
+                rawData.FullRender, rawData.BustRender,
+                typeof(GLTFAvImporter)
             );
+        }
+
+        private async Awaitable<GameObjectInstantiator?> GetGameObjectInstantiatorAndDisposeOnFail(GltfImport import, GameObject gameObject, bool throwOnFail)
+        {
+            if (InstantiatorFactory is null)
+                return new GameObjectInstantiator(import, gameObject.transform, Logger, InstantiationSettings);
+            
+            try
+            {
+                return await InstantiatorFactory(import, gameObject);
+            }
+            catch (Exception ex)
+            {
+                import.Dispose();
+                UnityEngine.Object.Destroy(gameObject);
+
+                if (throwOnFail) throw new AggregateException("Could not create instantiator due to exception from user code.", ex);
+                Debug.LogWarning($"{nameof(GLTFAvImporter)}: Could not create instantiator due to exception from user code:\n{ex}");
+                return null;
+            }
         }
     }
 
     /// <summary>
     /// A loaded glTF avatar.
     /// </summary>
-    public class LoadedGLTFAv : ILoadedAv
+    public class LoadedGLTFAv : LoadedAv
     {
-        /// <inheritdoc/>
-        public GameObject GameObject { get; }
-
-        /// <inheritdoc/>
-        public AvMetadata Metadata { get; }
-
-        /// <inheritdoc/>
-        public Texture2D? FullRender { get; }
-
-        /// <inheritdoc/>
-        public Texture2D? BustRender { get; }
-
-        /// <inheritdoc/>
-        public AvDataContainer RawData { get; }
-
-        /// <inheritdoc/>
-        public Type ImporterType { get; }
-
         /// <summary>The glTFast import associated with the avatar.</summary>
         public readonly GltfImport Import;
-
         private bool _disposed = false;
 
-        public LoadedGLTFAv(GameObject gameObject, GltfImport import, AvMetadata metadata, AvDataContainer rawData, Type importerType, Texture2D? fullRender, Texture2D? bustRender)
+        public LoadedGLTFAv(GameObject gameObject, GltfImport import, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
+            : base(gameObject, metadata, fullRender, bustRender, importerType)
         {
-            GameObject = gameObject;
-            Metadata = metadata;
             Import = import;
-            RawData = rawData;
-            ImporterType = importerType;
-
-            FullRender = fullRender;
-            BustRender = bustRender;
         }
 
         /// <inheritdoc/>
-        public void Dispose()
+        public override void Dispose()
         {
             if (_disposed)
                 return;

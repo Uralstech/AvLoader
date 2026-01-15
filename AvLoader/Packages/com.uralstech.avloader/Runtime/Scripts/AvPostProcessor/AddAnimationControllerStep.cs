@@ -31,7 +31,7 @@ namespace Uralstech.AvLoader
         public Avatar? Avatar;
 
         /// <inheritdoc/>
-        public void PostProcess(ILoadedAv avatar, AvDataContainer _)
+        public void PostProcess(LoadedAv avatar, AvDataContainer _)
         {
             Animator animator = avatar.GameObject.AddComponent<Animator>();
             animator.runtimeAnimatorController = AnimatorController;
