@@ -47,7 +47,7 @@ namespace Uralstech.AvLoader
     /// The role of the <see cref="IAvImporter"/> is to parse data returned by an
     /// <see cref="IAvDataLoader"/> and bring the avatar into Unity-space as a
     /// GameObject. Like <see cref="IAvDataLoader"/>s, they can be chained up to
-    /// create fallbacks, for example, a <see cref="GLTFAvImporter"/> for glTF
+    /// create fallbacks, for example, a <see cref="GLTFastAvImporter"/> for glTF
     /// support, falling back to one for .fbx support, etc.
     /// </remarks>
     public interface IAvImporter
@@ -62,7 +62,7 @@ namespace Uralstech.AvLoader
         /// </summary>
         /// <remarks>
         /// The returned <see cref="LoadedAv"/> may contain code to handle requirements of format-supporting plugins.
-        /// For example, <see cref="GLTFAvImporter"/> depends on glTFast, which requires that GltfImport object used
+        /// For example, <see cref="GLTFastAvImporter"/> depends on glTFast, which requires that GltfImport object used
         /// to import the avatar be active alongside the avatar's GameObject, and should be disposed after the avatar
         /// is no longer needed. Thus, <see cref="LoadedAv"/> implements <see cref="System.IDisposable"/>.
         /// </remarks>
