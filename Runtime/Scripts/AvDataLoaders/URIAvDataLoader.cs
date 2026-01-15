@@ -152,7 +152,7 @@ namespace Uralstech.AvLoader
 #pragma warning restore IDE0046 // Convert to conditional expression
 
                 return new AvDataContainer(
-                    modelDownload.downloadHandler.data, _modelFormat, null,
+                    modelDownload.downloadHandler.data, _modelFormat, _modelURI.AbsoluteUri,
                     metadata.Value, typeof(URIAvDataLoader), fullRender, bustRender
                 );
             }

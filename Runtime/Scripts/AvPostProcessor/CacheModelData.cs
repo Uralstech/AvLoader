@@ -22,10 +22,16 @@ using UnityEngine;
 namespace Uralstech.AvLoader
 {
     /// <summary>
-    /// Post-processing step which saves the loaded avatar's data into a local directory
-    /// for future loading. Skips if the avatar was already loaded using <see cref="FileAvDataLoader"/>,
-    /// although this can be overriden using <see cref="IgnoreOriginalLoaderType"/>.
+    /// Post-processing step that saves the loaded avatar's data to a local directory
+    /// for future use. Skips execution if the avatar was originally loaded using
+    /// <see cref="FileAvDataLoader"/>, unless overridden via <see cref="IgnoreOriginalLoaderType"/>.
     /// </summary>
+    /// <remarks>
+    /// This only works for formats where the model does not depend on resources
+    /// stored separately from the source file (<see cref="AvDataContainer.Model"/>).
+    /// For example, avatars loaded from OBJ files with external texture files
+    /// will not work.
+    /// </remarks>
     public class CacheModelData : IAvAsyncPostProcessor
     {
         /// <summary>
@@ -89,7 +95,7 @@ namespace Uralstech.AvLoader
         }
 
         /// <inheritdoc/>
-        public async Awaitable PostProcessAsync(ILoadedAv avatar, AvDataContainer rawData, CancellationToken token = default)
+        public async Awaitable PostProcessAsync(LoadedAv avatar, AvDataContainer rawData, CancellationToken token = default)
         {
             if (!IgnoreOriginalLoaderType && rawData.DataLoaderType == typeof(FileAvDataLoader))
                 return;

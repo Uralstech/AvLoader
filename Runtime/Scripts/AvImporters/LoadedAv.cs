@@ -21,21 +21,33 @@ namespace Uralstech.AvLoader
     /// <summary>
     /// A loaded avatar and its associated data.
     /// </summary>
-    public interface ILoadedAv : IDisposable
+    public abstract class LoadedAv : IDisposable
     {
         /// <summary>The avatar's GameObject.</summary>
-        public GameObject GameObject { get; }
+        public readonly GameObject GameObject;
 
         /// <summary>Metadata of the avatar.</summary>
-        public AvMetadata Metadata { get; }
+        public readonly AvMetadata Metadata;
 
         /// <summary>Optional full render of the avatar.</summary>
-        public Texture2D? FullRender { get; }
+        public readonly Texture2D? FullRender;
 
         /// <summary>Optional bust render of the avatar.</summary>
-        public Texture2D? BustRender { get; }
+        public readonly Texture2D? BustRender;
         
-        /// <summary>The type of the importer which created this <see cref="ILoadedAv"/>.</summary>
-        public Type ImporterType { get; }
+        /// <summary>The type of the importer which created this <see cref="LoadedAv"/>.</summary>
+        public readonly Type ImporterType;
+
+        protected LoadedAv(GameObject gameObject, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
+        {
+            GameObject = gameObject;
+            Metadata = metadata;
+            FullRender = fullRender;
+            BustRender = bustRender;
+            ImporterType = importerType;
+        }
+
+        /// <inheritdoc/>
+        public abstract void Dispose();
     }
 }
