@@ -28,7 +28,7 @@ namespace Uralstech.AvLoader
     /// <summary>
     /// Imports glTF avatars.
     /// </summary>
-    public class GLTFAvImporter : IAvImporter
+    public class GLTFastAvImporter : IAvImporter
     {
         /// <summary>
         /// Optional factory for custom glTFast GameObjectInstantiators.
@@ -69,11 +69,11 @@ namespace Uralstech.AvLoader
                 import.Dispose();
                 if (throwOnFail) throw new InvalidDataException("Could not import glTF avatar.");
                 
-                Debug.LogWarning($"{nameof(GLTFAvImporter)}: Could not import glTF avatar.");
+                Debug.LogWarning($"{nameof(GLTFastAvImporter)}: Could not import glTF avatar.");
                 return null;
             }
 
-            GameObject gameObject = new($"Avatar ({nameof(GLTFAvImporter)})");
+            GameObject gameObject = new($"Avatar ({nameof(GLTFastAvImporter)})");
             gameObject.SetActive(false);
 
             if (await GetGameObjectInstantiatorAndDisposeOnFail(import, gameObject, throwOnFail) is not GameObjectInstantiator instantiator)
@@ -86,14 +86,14 @@ namespace Uralstech.AvLoader
                 UnityEngine.Object.Destroy(gameObject);
 
                 if (throwOnFail) throw new InvalidDataException("Could not import glTF main scene.");
-                Debug.LogWarning($"{nameof(GLTFAvImporter)}: Could not import glTF main scene.");
+                Debug.LogWarning($"{nameof(GLTFastAvImporter)}: Could not import glTF main scene.");
                 return null;
             }
 
             return new LoadedGLTFAv(
                 gameObject, import, rawData.Metadata,
                 rawData.FullRender, rawData.BustRender,
-                typeof(GLTFAvImporter)
+                typeof(GLTFastAvImporter)
             );
         }
 
@@ -112,7 +112,7 @@ namespace Uralstech.AvLoader
                 UnityEngine.Object.Destroy(gameObject);
 
                 if (throwOnFail) throw new AggregateException("Could not create instantiator due to exception from user code.", ex);
-                Debug.LogWarning($"{nameof(GLTFAvImporter)}: Could not create instantiator due to exception from user code:\n{ex}");
+                Debug.LogWarning($"{nameof(GLTFastAvImporter)}: Could not create instantiator due to exception from user code:\n{ex}");
                 return null;
             }
         }
