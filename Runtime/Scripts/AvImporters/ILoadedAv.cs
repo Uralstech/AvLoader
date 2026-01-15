@@ -34,10 +34,7 @@ namespace Uralstech.AvLoader
 
         /// <summary>Optional bust render of the avatar.</summary>
         public Texture2D? BustRender { get; }
-
-        /// <summary>The <see cref="AvDataContainer"/> the avatar was imported from.</summary>
-        public AvDataContainer RawData { get; }
-
+        
         /// <summary>The type of the importer which created this <see cref="ILoadedAv"/>.</summary>
         public Type ImporterType { get; }
     }

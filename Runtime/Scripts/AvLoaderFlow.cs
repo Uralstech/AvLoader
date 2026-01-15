@@ -32,7 +32,7 @@ namespace Uralstech.AvLoader
         /// Index 0 is used first; if it cannot handle the data,
         /// the flow falls back to index 1, then 2, and so on.
         /// </remarks>
-        public readonly IReadOnlyList<IAvDataLoader> DataLoaders;
+        public readonly IReadOnlyCollection<IAvDataLoader> DataLoaders;
 
         /// <summary>
         /// The importers to use in the flow, in priority order.
@@ -41,19 +41,19 @@ namespace Uralstech.AvLoader
         /// Index 0 is used first; if it cannot handle the model format,
         /// the flow falls back to index 1, then 2, and so on.
         /// </remarks>
-        public readonly IReadOnlyList<IAvImporter> Importers;
+        public readonly IReadOnlyCollection<IAvImporter> Importers;
 
         /// <summary>
         /// Post-processors to run after loading the avatar.
         /// </summary>
-        public IReadOnlyList<IAvPostProcessor> PostProcessors = Array.Empty<IAvPostProcessor>();
+        public IEnumerable<IAvPostProcessor> PostProcessors = Array.Empty<IAvPostProcessor>();
         
         /// <summary>
         /// Async post-processors to run after loading the avatar.
         /// </summary>
-        public IReadOnlyList<IAvAsyncPostProcessor> AsyncPostProcessors = Array.Empty<IAvAsyncPostProcessor>();
+        public IEnumerable<IAvAsyncPostProcessor> AsyncPostProcessors = Array.Empty<IAvAsyncPostProcessor>();
 
-        public AvLoaderFlow(IReadOnlyList<IAvDataLoader> dataLoaders, IReadOnlyList<IAvImporter> importers)
+        public AvLoaderFlow(IReadOnlyCollection<IAvDataLoader> dataLoaders, IReadOnlyCollection<IAvImporter> importers)
         {
             if (dataLoaders.Count == 0) throw new ArgumentException("Zero data loaders defined for flow.", nameof(dataLoaders));
             if (importers.Count == 0) throw new ArgumentException("Zero importers defined for flow.", nameof(importers));
@@ -62,39 +62,85 @@ namespace Uralstech.AvLoader
             Importers = importers;
         }
 
+        /// <summary>
+        /// Runs the loader flow completely.
+        /// </summary>
+        /// <returns>The loaded avatar.</returns>
         public async Awaitable<ILoadedAv> RunFlowAsync(CancellationToken token = default)
         {
-            AvDataContainer? container = null;
-            int loadersCount = DataLoaders.Count;
-            for (int i = 0; i < loadersCount; i++)
+            AvDataContainer rawData = (await LoadAvatarDataAsync(true, token))!;
+            ILoadedAv avatar = (await ImportAvatarDataAsync(rawData, true, token))!;
+            await RunPostProcessorsAndDisposeAvOnFailAsync(avatar, rawData, true, token);
+
+            avatar.GameObject.SetActive(true);
+            return avatar;
+        }
+
+        /// <summary>
+        /// Tries to run the loader flow completely.
+        /// </summary>
+        /// <returns>The loaded avatar if the entire flow completed successfully; <see langword="null"/> otherwise.</returns>
+        public async Awaitable<ILoadedAv?> TryRunFlowAsync(CancellationToken token = default)
+        {
+            AvDataContainer? rawData = await LoadAvatarDataAsync(false, token);
+            if (rawData is null) return null;
+
+            ILoadedAv? avatar = await ImportAvatarDataAsync(rawData, true, token);
+            if (avatar is null) return null;
+
+            if (!await RunPostProcessorsAndDisposeAvOnFailAsync(avatar, rawData, true, token))
+                return null;
+
+            avatar.GameObject.SetActive(true);
+            return avatar;
+        }
+
+        private async Awaitable<AvDataContainer?> LoadAvatarDataAsync(bool throwOnFinalFail, CancellationToken token)
+        {
+            int counter = 0;
+            int failAtIdx = DataLoaders.Count - 1;
+            foreach (IAvDataLoader loader in DataLoaders)
             {
-                IAvDataLoader loader = DataLoaders[i];
-                container = await loader.LoadAvatarAsync(i == loadersCount - 1, token);
-                if (container is not null)
-                {
-                Debug.Log($"LOADED USING: {loader.GetType()}");
-                    break;
-                }
+                if (await loader.LoadAvatarAsync(throwOnFinalFail && counter == failAtIdx, token) is AvDataContainer avData)
+                    return avData;
             }
 
-            ILoadedAv? loadedAvatar = null;
-            int importersCount = Importers.Count;
-            for (int i = 0; i < importersCount; i++)
+            return null;
+        }
+
+        private async Awaitable<ILoadedAv?> ImportAvatarDataAsync(AvDataContainer rawData, bool throwOnFinalFail, CancellationToken token)
+        {
+            int counter = 0;
+            int failAtIdx = Importers.Count - 1;
+            foreach (IAvImporter importer in Importers)
             {
-                IAvImporter importer = Importers[i];
-                loadedAvatar = await importer.ImportAvatarAsync(container!, i == importersCount - 1, token);
-                if (loadedAvatar is not null)
-                    break;
+                if (await importer.ImportAvatarAsync(rawData, throwOnFinalFail && counter == failAtIdx, token) is ILoadedAv avatar)
+                    return avatar;
             }
 
-            foreach (IAvPostProcessor postProcessor in PostProcessors)
-                postProcessor.PostProcess(loadedAvatar!);
+            return null;
+        }
+    
+        private async Awaitable<bool> RunPostProcessorsAndDisposeAvOnFailAsync(ILoadedAv avatar, AvDataContainer rawData, bool throwOnFail, CancellationToken token)
+        {
+            try
+            {
+                foreach (IAvPostProcessor postProcessor in PostProcessors)
+                    postProcessor.PostProcess(avatar, rawData);
 
-            foreach (IAvAsyncPostProcessor asyncPostProcessor in AsyncPostProcessors)
-                await asyncPostProcessor.PostProcessAsync(loadedAvatar!);
+                foreach (IAvAsyncPostProcessor asyncPostProcessor in AsyncPostProcessors)
+                    await asyncPostProcessor.PostProcessAsync(avatar, rawData, token);
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                avatar.Dispose();
+                if (throwOnFail) throw;
 
-            loadedAvatar!.GameObject.SetActive(true);
-            return loadedAvatar;
+                Debug.LogWarning($"{nameof(AvLoaderFlow)}: Could not load avatar due to post-processor exception:\n{ex}");
+                return false;
+            }
         }
     }
 }

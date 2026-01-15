@@ -21,60 +21,107 @@ using UnityEngine;
 #nullable enable
 namespace Uralstech.AvLoader
 {
+    /// <summary>
+    /// Post-processing step which saves the loaded avatar's data into a local directory
+    /// for future loading. Skips if the avatar was already loaded using <see cref="FileAvDataLoader"/>,
+    /// although this can be overriden using <see cref="IgnoreOriginalLoaderType"/>.
+    /// </summary>
     public class CacheModelData : IAvAsyncPostProcessor
     {
-        public readonly string Directory;
-        public readonly AvImageFileExtension FullRenderImageFormat;
-        public readonly AvImageFileExtension BustRenderImageFormat;
-
-        public CacheModelData(string baseDirectory, string avatarDirectoryName,
-            AvImageFileExtension fullRenderImageFormat = AvImageFileExtension.JPG, AvImageFileExtension bustRenderImageFormat = AvImageFileExtension.JPG)
+        /// <summary>
+        /// The base directory to save the avatar to.
+        /// </summary>
+        /// <remarks>
+        /// If <see cref="UseAvatarIdAsDirName"/> is <see langword="true"/> (default),
+        /// the avatar will be stored in a new directory at "<see cref="BaseDirectory"/>/<see cref="AvMetadata.Id"/>".
+        /// </remarks>
+        public string BaseDirectory;
+        
+        private AvImageFileExtension _fullRenderImageFormat = AvImageFileExtension.JPG;
+        
+        /// <summary>The file extension and format for saving the avatar's full render. Cannot be presumptive, like <see cref="AvImageFileExtension.JPEGAny"/>.</summary>
+        public AvImageFileExtension FullRenderImageFormat
         {
-            Directory = Path.Join(baseDirectory, avatarDirectoryName);
-            FullRenderImageFormat = fullRenderImageFormat;
-            BustRenderImageFormat = bustRenderImageFormat;
+            get => _fullRenderImageFormat;
+            set
+            {
+                if (value is AvImageFileExtension.JPEGAny or AvImageFileExtension.None)
+                    throw new ArgumentException($"Unsupported file extension for caching avatar renders: {value}", nameof(value));
 
-            if (fullRenderImageFormat is AvImageFileExtension.JPEGAny or AvImageFileExtension.None)
-                throw new ArgumentException($"Unsupported file extension for caching avatar renders: {fullRenderImageFormat}", nameof(fullRenderImageFormat));
+                _fullRenderImageFormat = value;
+            }
+        }
+        
+        private AvImageFileExtension _bustRenderImageFormat = AvImageFileExtension.JPG;
 
-            if (bustRenderImageFormat is AvImageFileExtension.JPEGAny or AvImageFileExtension.None)
-                throw new ArgumentException($"Unsupported file extension for caching avatar renders: {bustRenderImageFormat}", nameof(bustRenderImageFormat));
+        /// <summary>The file extension and format for saving the avatar's bust render. Cannot be presumptive, like <see cref="AvImageFileExtension.JPEGAny"/>.</summary>
+        public AvImageFileExtension BustRenderImageFormat
+        {
+            get => _bustRenderImageFormat;
+            set
+            {
+                if (value is AvImageFileExtension.JPEGAny or AvImageFileExtension.None)
+                    throw new ArgumentException($"Unsupported file extension for caching avatar renders: {value}", nameof(value));
+
+                _bustRenderImageFormat = value;
+            }
         }
 
-        public async Awaitable PostProcessAsync(ILoadedAv avatar, CancellationToken token = default)
+        /// <summary>The quality to encode the avatar's full render, if saving as JPEG.</summary>
+        public int FullRenderJPEGQuality = 100;
+
+        /// <summary>The quality to encode the avatar's bust render, if saving as JPEG.</summary>
+        public int BustRenderJPEGQuality = 100;
+
+        /// <summary>Should the avatar be saved even if it was loaded from the local filesystem?</summary>
+        public bool IgnoreOriginalLoaderType;
+
+        /// <summary>
+        /// If <see langword="true"/> (default), the avatar will be stored in a new directory at "<see cref="BaseDirectory"/>/<see cref="AvMetadata.Id"/>".
+        /// Otherwise, <see cref="BaseDirectory"/> is used as-is.
+        /// </summary>
+        public bool UseAvatarIdAsDirName;
+
+        public CacheModelData(string baseDirectory, bool useAvatarIdAsChildDirName = true)
         {
-            if (avatar.RawData.DataLoaderType == typeof(FileAvDataLoader))
+            BaseDirectory = baseDirectory;
+            UseAvatarIdAsDirName = useAvatarIdAsChildDirName;
+        }
+
+        /// <inheritdoc/>
+        public async Awaitable PostProcessAsync(ILoadedAv avatar, AvDataContainer rawData, CancellationToken token = default)
+        {
+            if (!IgnoreOriginalLoaderType && rawData.DataLoaderType == typeof(FileAvDataLoader))
                 return;
 
-            if (!IOUtils.s_modelFileExtensionToStringLookup.TryGetValue(avatar.RawData.ModelFormat, out string extension))
+            if (!IOUtils.s_modelFileExtensionToStringLookup.TryGetValue(rawData.ModelFormat, out string extension))
             {
-                Debug.LogError($"{nameof(CacheModelData)}: Could not save avatar due to unrecognized model format/extension: '{avatar.RawData.ModelFormat}'.");
+                Debug.LogError($"{nameof(CacheModelData)}: Could not save avatar due to unrecognized model format/extension: '{rawData.ModelFormat}'.");
                 return;
             }
 
             try
             {
-                if (!System.IO.Directory.Exists(Directory))
-                    System.IO.Directory.CreateDirectory(Directory);
+                string directory = UseAvatarIdAsDirName ? Path.Join(BaseDirectory, avatar.Metadata.Id) : BaseDirectory;
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
 
-                await File.WriteAllBytesAsync(Path.Join(Directory, $"{IOUtils.DefaultModelFile}{extension}"), avatar.RawData.Model, token);
-                await File.WriteAllTextAsync(Path.Join(Directory, IOUtils.DefaultMetadataFile), JsonConvert.SerializeObject(avatar.RawData.Metadata), token);
+                await File.WriteAllBytesAsync(Path.Join(directory, $"{IOUtils.DefaultModelFile}{extension}"), rawData.Model, token);
+                await File.WriteAllTextAsync(Path.Join(directory, IOUtils.DefaultMetadataFile), JsonConvert.SerializeObject(rawData.Metadata), token);
 
                 if (avatar.FullRender != null)
                 {
                     await File.WriteAllBytesAsync(
-                        Path.Join(Directory, $"{IOUtils.DefaultFullRenderFile}{IOUtils.s_imageFileExtensionToStringLookup[FullRenderImageFormat]}"),
-                        EncodeToFormat(avatar.FullRender, FullRenderImageFormat), token);
+                        Path.Join(directory, $"{IOUtils.DefaultFullRenderFile}{IOUtils.s_imageFileExtensionToStringLookup[FullRenderImageFormat]}"),
+                        EncodeToFormat(avatar.FullRender, FullRenderImageFormat, FullRenderJPEGQuality), token);
                 }
 
                 if (avatar.BustRender != null)
                 {
                     await File.WriteAllBytesAsync(
-                        Path.Join(Directory, $"{IOUtils.DefaultBustRenderFile}{IOUtils.s_imageFileExtensionToStringLookup[BustRenderImageFormat]}"),
-                        EncodeToFormat(avatar.BustRender, BustRenderImageFormat), token);
+                        Path.Join(directory, $"{IOUtils.DefaultBustRenderFile}{IOUtils.s_imageFileExtensionToStringLookup[BustRenderImageFormat]}"),
+                        EncodeToFormat(avatar.BustRender, BustRenderImageFormat, BustRenderJPEGQuality), token);
                 }
-
-                Debug.Log("SAVED");
             }
             catch (JsonException ex)
             {
@@ -86,11 +133,11 @@ namespace Uralstech.AvLoader
             }
         }
 
-        private static byte[] EncodeToFormat(Texture2D image, AvImageFileExtension format)
+        private static byte[] EncodeToFormat(Texture2D image, AvImageFileExtension format, int quality)
         {
             return format switch
             {
-                AvImageFileExtension.JPEG or AvImageFileExtension.JPG => image.EncodeToJPG(),
+                AvImageFileExtension.JPEG or AvImageFileExtension.JPG => image.EncodeToJPG(quality),
                 AvImageFileExtension.PNG => image.EncodeToPNG(),
                 _ => throw new NotImplementedException()
             };

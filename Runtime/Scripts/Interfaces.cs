@@ -80,8 +80,9 @@ namespace Uralstech.AvLoader
         /// <summary>
         /// Runs a post-processing step on the given avatar.
         /// </summary>
-        /// <param name="avatar">The raw avatar data to process.</param>
-        public void PostProcess(ILoadedAv avatar);
+        /// <param name="avatar">The loaded avatar to process.</param>
+        /// <param name="rawData">The raw data of the loaded avatar.</param>
+        public void PostProcess(ILoadedAv avatar, AvDataContainer rawData);
     }
 
     /// <summary>
@@ -92,7 +93,8 @@ namespace Uralstech.AvLoader
         /// <summary>
         /// Runs a post-processing step on the given avatar.
         /// </summary>
-        /// <param name="avatar">The raw avatar data to process.</param>
-        public Awaitable PostProcessAsync(ILoadedAv avatar, CancellationToken token = default);
+        /// <param name="avatar">The loaded avatar to process.</param>
+        /// <param name="rawData">The raw data of the loaded avatar.</param>
+        public Awaitable PostProcessAsync(ILoadedAv avatar, AvDataContainer rawData, CancellationToken token = default);
     }
 }
