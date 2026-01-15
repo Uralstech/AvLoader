@@ -26,6 +26,7 @@ namespace Uralstech.AvLoader
         None = 0,
         GLTF, GLB,
         GLTFAny,
+        VRM
     }
 
     /// <summary>
@@ -59,6 +60,7 @@ namespace Uralstech.AvLoader
             new(".jpg", AvImageFileExtension.JPG),
         };
 
+        internal static readonly KeyValuePair<string, AvModelFileExtension>[] s_modelStringAndModelFileExtensionPairs;
         internal static readonly KeyValuePair<string, AvImageFileExtension>[] s_imageStringAndImageFileExtensionPairs;
         internal static readonly Dictionary<string, AvModelFileExtension> s_stringToModelFileExtensionLookup;
         internal static readonly Dictionary<string, AvImageFileExtension> s_stringToImageFileExtensionLookup;
@@ -70,11 +72,16 @@ namespace Uralstech.AvLoader
             KeyValuePair<string, AvImageFileExtension>[] completeImageExtensionPairs = new KeyValuePair<string, AvImageFileExtension>[s_jpegStringAndImageFileExtensionPairs.Length + 1];
             Array.Copy(s_jpegStringAndImageFileExtensionPairs, completeImageExtensionPairs, s_jpegStringAndImageFileExtensionPairs.Length);
             completeImageExtensionPairs[^1] = new KeyValuePair<string, AvImageFileExtension>(".png", AvImageFileExtension.PNG);
-
             s_imageStringAndImageFileExtensionPairs = completeImageExtensionPairs;
-            s_stringToModelFileExtensionLookup = new Dictionary<string, AvModelFileExtension>(s_gltfStringAndModelFileExtensionPairs, StringComparer.OrdinalIgnoreCase);
+
+            KeyValuePair<string, AvModelFileExtension>[] completeModelExtensionPairs = new KeyValuePair<string, AvModelFileExtension>[s_gltfStringAndModelFileExtensionPairs.Length + 1];
+            Array.Copy(s_gltfStringAndModelFileExtensionPairs, completeModelExtensionPairs, s_gltfStringAndModelFileExtensionPairs.Length);
+            completeModelExtensionPairs[^1] = new KeyValuePair<string, AvModelFileExtension>(".vrm", AvModelFileExtension.VRM);
+            s_modelStringAndModelFileExtensionPairs = completeModelExtensionPairs;
+
+            s_stringToModelFileExtensionLookup = new Dictionary<string, AvModelFileExtension>(s_modelStringAndModelFileExtensionPairs, StringComparer.OrdinalIgnoreCase);
             s_stringToImageFileExtensionLookup = new Dictionary<string, AvImageFileExtension>(s_imageStringAndImageFileExtensionPairs, StringComparer.OrdinalIgnoreCase);
-            s_modelFileExtensionToStringLookup = CreateReverseDictionary(s_gltfStringAndModelFileExtensionPairs);
+            s_modelFileExtensionToStringLookup = CreateReverseDictionary(s_modelStringAndModelFileExtensionPairs);
             s_imageFileExtensionToStringLookup = CreateReverseDictionary(s_imageStringAndImageFileExtensionPairs);
         }
 

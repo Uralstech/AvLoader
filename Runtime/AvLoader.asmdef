@@ -2,7 +2,9 @@
     "name": "AvLoader",
     "rootNamespace": "",
     "references": [
-        "GUID:a42927d1d4a3b4cda9b076a7adecb9cc"
+        "GUID:a42927d1d4a3b4cda9b076a7adecb9cc",
+        "GUID:e47c917724578cc43b5506c17a27e9a0",
+        "GUID:8d76e605759c3f64a957d63ef96ada7c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -18,6 +20,16 @@
             "name": "com.unity.cloud.gltfast",
             "expression": "6.15.0",
             "define": "GLTFAST_INSTALLED"
+        },
+        {
+            "name": "com.vrmc.vrm",
+            "expression": "0.131.0",
+            "define": "UNIVRM10_INSTALLED"
+        },
+        {
+            "name": "com.vrmc.gltf",
+            "expression": "0.131.0",
+            "define": "UNIGLTF_INSTALLED"
         },
         {
             "name": "com.unity.modules.animation",

@@ -69,7 +69,7 @@ namespace Uralstech.AvLoader
         public async Awaitable<LoadedAv> RunFlowAsync(CancellationToken token = default)
         {
             AvDataContainer rawData = (await LoadAvatarDataAsync(true, token))!;
-            LoadedAv avatar = (await ImportAvatarDataAsync(rawData, true, token))!;
+            LoadedAv avatar = (await ImportAvatarAsync(rawData, true, token))!;
             await RunPostProcessorsAndDisposeAvOnFailAsync(avatar, rawData, true, token);
 
             avatar.GameObject.SetActive(true);
@@ -85,7 +85,7 @@ namespace Uralstech.AvLoader
             AvDataContainer? rawData = await LoadAvatarDataAsync(false, token);
             if (rawData is null) return null;
 
-            LoadedAv? avatar = await ImportAvatarDataAsync(rawData, true, token);
+            LoadedAv? avatar = await ImportAvatarAsync(rawData, true, token);
             if (avatar is null) return null;
 
             if (!await RunPostProcessorsAndDisposeAvOnFailAsync(avatar, rawData, true, token))
@@ -108,19 +108,23 @@ namespace Uralstech.AvLoader
             return null;
         }
 
-        private async Awaitable<LoadedAv?> ImportAvatarDataAsync(AvDataContainer rawData, bool throwOnFinalFail, CancellationToken token)
+        private async Awaitable<LoadedAv?> ImportAvatarAsync(AvDataContainer rawData, bool throwOnFinalFail, CancellationToken token)
         {
             int counter = 0;
             int failAtIdx = Importers.Count - 1;
             foreach (IAvImporter importer in Importers)
             {
-                if (await importer.ImportAvatarAsync(rawData, throwOnFinalFail && counter == failAtIdx, token) is LoadedAv avatar)
+                if (importer.SupportsFormat(rawData.ModelFormat)
+                    && await importer.ImportAvatarAsync(rawData, throwOnFinalFail && counter == failAtIdx, token) is LoadedAv avatar)
                     return avatar;
             }
 
-            return null;
+            return throwOnFinalFail
+                ? throw new NotSupportedException($"No importer defined that supports format '{rawData.ModelFormat}'.")
+                : null;
         }
-    
+
+
         private async Awaitable<bool> RunPostProcessorsAndDisposeAvOnFailAsync(LoadedAv avatar, AvDataContainer rawData, bool throwOnFail, CancellationToken token)
         {
             try

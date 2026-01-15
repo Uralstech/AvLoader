@@ -175,7 +175,9 @@ namespace Uralstech.AvLoader
                 return true;
             }
 
-            KeyValuePair<string, AvModelFileExtension>[] validExtensions = IOUtils.s_gltfStringAndModelFileExtensionPairs;
+            KeyValuePair<string, AvModelFileExtension>[] validExtensions = baseExt is AvModelFileExtension.GLTFAny
+                ? IOUtils.s_gltfStringAndModelFileExtensionPairs : IOUtils.s_modelStringAndModelFileExtensionPairs;
+
             foreach (KeyValuePair<string, AvModelFileExtension> pair in validExtensions)
             {
                 string path = Path.Join(basePath, $"{fileName}{pair.Key}");
