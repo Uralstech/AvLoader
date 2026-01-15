@@ -21,10 +21,24 @@ using UnityEngine.Networking;
 #nullable enable
 namespace Uralstech.AvLoader
 {
+    /// <summary>
+    /// Utility extensions for web requests.
+    /// </summary>
+    /// <remarks>
+    /// This class is <see langword="public"/> to allow package users to reuse these extensions if useful.
+    /// However, it should not be considered stable and is not part of the supported public API.
+    /// It exists solely as an internal utility and may change or be removed at any time.
+    /// /// </remarks>
     public static class WebRequestExtensions
     {
+        /// <summary>
+        /// Wraps an <see cref="AsyncOperation"/> as a <see cref="Task"/>.
+        /// </summary>
         public static async Task AsTask(this AsyncOperation current) => await current;
 
+        /// <summary>
+        /// Sends all <see cref="UnityWebRequest"/>s in the current list, and creates a <see cref="Task"/>[] for their async operations.
+        /// </summary>
         public static Task[] SendAll(this List<UnityWebRequest> current)
         {
             int count = current.Count;
@@ -35,6 +49,9 @@ namespace Uralstech.AvLoader
             return tasks;
         }
 
+        /// <summary>
+        /// Enumerates the erred/failed <see cref="UnityWebRequest"/>s in the current list.
+        /// </summary>
         public static IEnumerable<UnityWebRequest> GetErred(this List<UnityWebRequest> current)
         {
             foreach (UnityWebRequest request in current)
@@ -44,6 +61,9 @@ namespace Uralstech.AvLoader
             }
         }
 
+        /// <summary>
+        /// Aborts all <see cref="UnityWebRequest"/>s in the current list.
+        /// </summary>
         public static void AbortAll(this List<UnityWebRequest> current)
         {
             int count = current.Count;
@@ -51,6 +71,9 @@ namespace Uralstech.AvLoader
                 current[i].Abort();
         }
 
+        /// <summary>
+        /// Disposes all <see cref="UnityWebRequest"/>s in the current list.
+        /// </summary>
         public static void DisposeAll(this List<UnityWebRequest> current)
         {
             int count = current.Count;
@@ -58,6 +81,9 @@ namespace Uralstech.AvLoader
                 current[i].Dispose();
         }
 
+        /// <summary>
+        /// Awaits for the <see cref="DownloadHandlerTexture"/> of the current <see cref="UnityWebRequest"/> to finish processing its texture.
+        /// </summary>
         public static async Awaitable AwaitTextureProcessing(this UnityWebRequest? request, CancellationToken token)
         {
             if (request?.downloadHandler is not DownloadHandlerTexture downloadHandler || downloadHandler.isDone)

@@ -6,7 +6,6 @@ The code may be used in accordance with the Apache 2.0 license, but it is highly
 
 TODO:
 - Add material swapper post-processing step
-- Add conditional animation avatar assignment post-processing step
 
 <!---
 [![openupm](https://img.shields.io/npm/v/com.uralstech.avloader?label=openupm&registry_uri=https://package.openupm.com)](https://openupm.com/packages/com.uralstech.avloader/)

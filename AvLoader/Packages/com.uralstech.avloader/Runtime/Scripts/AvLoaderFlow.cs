@@ -51,7 +51,7 @@ namespace Uralstech.AvLoader
         /// <summary>
         /// Async post-processors to run after loading the avatar.
         /// </summary>
-        public IEnumerable<IAvAsyncPostProcessor> AsyncPostProcessors = Array.Empty<IAvAsyncPostProcessor>();
+        public IEnumerable<IAsyncAvPostProcessor> AsyncPostProcessors = Array.Empty<IAsyncAvPostProcessor>();
 
         public AvLoaderFlow(IReadOnlyCollection<IAvDataLoader> dataLoaders, IReadOnlyCollection<IAvImporter> importers)
         {
@@ -119,9 +119,9 @@ namespace Uralstech.AvLoader
                     return avatar;
             }
 
-            return throwOnFinalFail
-                ? throw new NotSupportedException($"No importer defined that supports format '{rawData.ModelFormat}'.")
-                : null;
+            if (throwOnFinalFail) throw new NotSupportedException($"No importer defined that supports format '{rawData.ModelFormat}'.");
+            Debug.LogWarning($"{nameof(AvLoaderFlow)}: No importer defined that supports format '{rawData.ModelFormat}'.");
+            return null;
         }
 
 
@@ -132,7 +132,7 @@ namespace Uralstech.AvLoader
                 foreach (IAvPostProcessor postProcessor in PostProcessors)
                     postProcessor.PostProcess(avatar, rawData);
 
-                foreach (IAvAsyncPostProcessor asyncPostProcessor in AsyncPostProcessors)
+                foreach (IAsyncAvPostProcessor asyncPostProcessor in AsyncPostProcessors)
                     await asyncPostProcessor.PostProcessAsync(avatar, rawData, token);
                 
                 return true;
