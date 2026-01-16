@@ -17,7 +17,7 @@ using System.Threading;
 using UnityEngine;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.PostProcessors
 {
     /// <summary>
     /// QoL post-processor that runs an <see cref="Action"/>.

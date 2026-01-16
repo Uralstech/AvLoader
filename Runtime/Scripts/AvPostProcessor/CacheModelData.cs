@@ -17,9 +17,11 @@ using System.IO;
 using System.Threading;
 using Newtonsoft.Json;
 using UnityEngine;
+using Uralstech.AvLoader.DataLoaders;
+using Uralstech.AvLoader.Utils;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.PostProcessors
 {
     /// <summary>
     /// Post-processing step that saves the loaded avatar's data to a local directory

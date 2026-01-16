@@ -20,7 +20,7 @@ using UnityEngine;
 using UniVRM10;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.Importers
 {
     /// <summary>
     /// Imports VRM avatars using <a href="https://github.com/vrm-c/UniVRM">UniVRM10</a>.
