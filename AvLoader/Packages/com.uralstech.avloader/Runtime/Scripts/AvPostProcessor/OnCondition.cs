@@ -17,7 +17,7 @@ using System.Threading;
 using UnityEngine;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.PostProcessors
 {
     /// <summary>
     /// Post-processing step that runs based on the given condition.

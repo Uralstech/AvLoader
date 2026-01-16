@@ -23,7 +23,7 @@ using GLTFast.Materials;
 using UnityEngine;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.Importers
 {
     /// <summary>
     /// Imports glTF avatars using <a href="https://docs.unity3d.com/Packages/com.unity.cloud.gltfast@6.15/manual/index.html">glTFast</a>.

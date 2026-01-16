@@ -19,7 +19,7 @@ using UniGLTF;
 using UnityEngine;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.Importers
 {
     /// <summary>
     /// Imports glTF avatars using <a href="https://github.com/vrm-c/UniVRM">UniGLTF</a>.

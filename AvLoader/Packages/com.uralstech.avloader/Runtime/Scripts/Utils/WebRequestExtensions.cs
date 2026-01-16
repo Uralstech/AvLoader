@@ -19,7 +19,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.Utils
 {
     /// <summary>
     /// Utility extensions for web requests.

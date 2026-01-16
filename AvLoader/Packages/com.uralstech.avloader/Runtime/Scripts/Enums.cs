@@ -36,4 +36,45 @@ namespace Uralstech.AvLoader
         [EnumMember(Value = "fullbody-xr")]
         HumanoidFullBodyXR,
     }
+    
+    /// <summary>
+    /// The gender a loaded avatar or of the outfit it is wearing.
+    /// Can be useful for using specific animation avatars for
+    /// different types.
+    /// </summary>
+    public enum AvGender
+    {
+        None = 0,
+
+        [EnumMember(Value = "masculine")]
+        Masculine,
+
+        [EnumMember(Value = "feminine")]
+        Feminine,
+
+        [EnumMember(Value = "neutral")]
+        Neutral,
+    }
+    
+    /// <summary>
+    /// The file extension of an avatar's model.
+    /// </summary>
+    public enum AvModelFileExtension
+    {
+        None = 0,
+        GLTF, GLB,
+        GLTFAny,
+        VRM
+    }
+
+    /// <summary>
+    /// The file extension of an avatar's render(s).
+    /// </summary>
+    public enum AvImageFileExtension
+    {
+        None = 0,
+        JPEG, JPG,
+        JPEGAny,
+        PNG,
+    }
 }

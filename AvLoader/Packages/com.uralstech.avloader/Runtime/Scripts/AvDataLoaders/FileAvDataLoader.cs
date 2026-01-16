@@ -19,9 +19,10 @@ using System.IO;
 using System.Threading;
 using Newtonsoft.Json;
 using UnityEngine;
+using Uralstech.AvLoader.Utils;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.DataLoaders
 {
     /// <summary>
     /// Loads avatars from on-device files.
@@ -58,7 +59,7 @@ namespace Uralstech.AvLoader
         /// <param name="shouldLoadBustRender">Should the bust render be loaded?</param>
         public FileAvDataLoader(string basePath, AvModelFileExtension modelFormat = AvModelFileExtension.None,
             AvImageFileExtension fullRenderFormat = AvImageFileExtension.None, AvImageFileExtension bustRenderFormat = AvImageFileExtension.None,
-            bool shouldLoadFullRender = true, bool shouldLoadBustRender = true)
+            bool shouldLoadFullRender = false, bool shouldLoadBustRender = false)
         {
             _modelFormat = modelFormat;
             _fullRenderFormat = fullRenderFormat;
@@ -189,7 +190,7 @@ namespace Uralstech.AvLoader
                 return true;
             }
 
-            string errorMessage = $"File '{fileName}' with matching extensions for '{baseExt}' were not found at directory '{basePath}'.";
+            string errorMessage = $"A valid model file with name '{fileName}' was not found at directory '{basePath}', provided extension for search: '{baseExt}'.";
             if (throwOnFail) throw new FileNotFoundException(errorMessage);
 
             Debug.LogWarning($"{nameof(FileAvDataLoader)}: {errorMessage}");
@@ -220,7 +221,7 @@ namespace Uralstech.AvLoader
                 return true;
             }
 
-            string errorMessage = $"File '{fileName}' with matching extensions for '{baseExt}' were not found at directory '{basePath}'.";
+            string errorMessage = $"A valid image file with name '{fileName}' was not found at directory '{basePath}', provided extension for search: '{baseExt}'.";
             if (throwOnFail) throw new FileNotFoundException(errorMessage);
 
             Debug.LogWarning($"{nameof(FileAvDataLoader)}: {errorMessage}");

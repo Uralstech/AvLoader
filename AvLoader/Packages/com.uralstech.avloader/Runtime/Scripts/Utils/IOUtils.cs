@@ -16,30 +16,8 @@ using System;
 using System.Collections.Generic;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.Utils
 {
-    /// <summary>
-    /// The file extension of an avatar's model.
-    /// </summary>
-    public enum AvModelFileExtension
-    {
-        None = 0,
-        GLTF, GLB,
-        GLTFAny,
-        VRM
-    }
-
-    /// <summary>
-    /// The file extension of an avatar's render(s).
-    /// </summary>
-    public enum AvImageFileExtension
-    {
-        None = 0,
-        JPEG, JPG,
-        JPEGAny,
-        PNG,
-    }
-
     /// yeah this is a mess
     internal static class IOUtils
     {

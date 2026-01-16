@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.PostProcessors
 {
     /// <summary>
     /// Post-processing step which adds or updates an animation controller in the loaded avatar.

@@ -16,7 +16,7 @@ using System.IO;
 using UnityEngine.Networking;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.Utils
 {
     /// <summary>
     /// Exception thrown when a <see cref="UnityWebRequest"/> fails, providing detailed request information.

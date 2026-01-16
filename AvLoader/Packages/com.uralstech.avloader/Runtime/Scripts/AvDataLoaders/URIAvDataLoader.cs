@@ -22,9 +22,10 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
+using Uralstech.AvLoader.Utils;
 
 #nullable enable
-namespace Uralstech.AvLoader
+namespace Uralstech.AvLoader.DataLoaders
 {
     /// <summary>
     /// Loads avatar data from remote URIs via <see cref="UnityWebRequest.Get(Uri)"/>.
