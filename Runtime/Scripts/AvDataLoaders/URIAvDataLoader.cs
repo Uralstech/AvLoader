@@ -75,7 +75,7 @@ namespace Uralstech.AvLoader.DataLoaders
         }
 
         /// <inheritdoc/>
-        public async Awaitable<AvDataContainer?> LoadAvatarAsync(bool throwOnFail, CancellationToken token = default)
+        public async Awaitable<AvSourceData?> LoadAvatarAsync(bool throwOnFail, CancellationToken token = default)
         {
             UnityWebRequest? modelDownload = await CreateAndConfigureGetRequest(_modelURI, UnityWebRequest.Get, throwOnFail),
                              metadataDownload = await CreateAndConfigureGetRequest(_metadataURI, UnityWebRequest.Get, throwOnFail);
@@ -143,16 +143,16 @@ namespace Uralstech.AvLoader.DataLoaders
 
                 Texture2D? fullRender = null, bustRender = null;
                 await fullRenderDownload.AwaitTextureProcessing(token);
-                if (fullRenderDownload is not null && !TryDecodeImage(fullRenderDownload, nameof(AvDataContainer.FullRender), throwOnFail, out fullRender))
+                if (fullRenderDownload is not null && !TryDecodeImage(fullRenderDownload, nameof(AvSourceData.FullRender), throwOnFail, out fullRender))
                     return null;
 
                 await bustRenderDownload.AwaitTextureProcessing(token);
 #pragma warning disable IDE0046 // Convert to conditional expression
-                if (bustRenderDownload is not null && !TryDecodeImage(bustRenderDownload, nameof(AvDataContainer.BustRender), throwOnFail, out bustRender))
+                if (bustRenderDownload is not null && !TryDecodeImage(bustRenderDownload, nameof(AvSourceData.BustRender), throwOnFail, out bustRender))
                     return null;
 #pragma warning restore IDE0046 // Convert to conditional expression
 
-                return new AvDataContainer(
+                return new AvSourceData(
                     modelDownload.downloadHandler.data, _modelFormat, _modelURI.AbsoluteUri,
                     metadata.Value, typeof(URIAvDataLoader), fullRender, bustRender
                 );

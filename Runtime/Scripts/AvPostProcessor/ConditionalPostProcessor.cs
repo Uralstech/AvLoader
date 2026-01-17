@@ -22,10 +22,10 @@ namespace Uralstech.AvLoader.PostProcessors
     /// <summary>
     /// Post-processing step that runs based on the given condition.
     /// </summary>
-    public class OnCondition : IAvPostProcessor, IAsyncAvPostProcessor
+    public class ConditionalPostProcessor : IAvPostProcessor, IAsyncAvPostProcessor
     {
         /// <summary>Condition callback.</summary>
-        public Func<LoadedAv, AvDataContainer, bool> Condition;
+        public Func<LoadedAv, AvSourceData, bool> Condition;
 
         private object _postProcessor;
 
@@ -45,27 +45,27 @@ namespace Uralstech.AvLoader.PostProcessors
             }
         }
 
-        public OnCondition(Func<LoadedAv, AvDataContainer, bool> condition, IAvPostProcessor postProcessor)
+        public ConditionalPostProcessor(Func<LoadedAv, AvSourceData, bool> condition, IAvPostProcessor postProcessor)
         {
             Condition = condition;
             _postProcessor = postProcessor;
         }
 
-        public OnCondition(Func<LoadedAv, AvDataContainer, bool> condition, IAsyncAvPostProcessor asyncPostProcessor)
+        public ConditionalPostProcessor(Func<LoadedAv, AvSourceData, bool> condition, IAsyncAvPostProcessor asyncPostProcessor)
         {
             Condition = condition;
             _postProcessor = asyncPostProcessor;
         }
 
         /// <inheritdoc/>
-        public void PostProcess(LoadedAv avatar, AvDataContainer rawData)
+        public void PostProcess(LoadedAv avatar, AvSourceData rawData)
         {
             if (PostProcessor is IAvPostProcessor postProcessor && Condition(avatar, rawData))
                 postProcessor.PostProcess(avatar, rawData);
         }
 
         /// <inheritdoc/>
-        public async Awaitable PostProcessAsync(LoadedAv avatar, AvDataContainer rawData, CancellationToken token = default)
+        public async Awaitable PostProcessAsync(LoadedAv avatar, AvSourceData rawData, CancellationToken token = default)
         {
             if (PostProcessor is IAsyncAvPostProcessor asyncPostProcessor && Condition(avatar, rawData))
                 await asyncPostProcessor.PostProcessAsync(avatar, rawData, token);

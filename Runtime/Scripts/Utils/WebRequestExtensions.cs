@@ -28,7 +28,7 @@ namespace Uralstech.AvLoader.Utils
     /// This class is <see langword="public"/> to allow package users to reuse these extensions if useful.
     /// However, it should not be considered stable and is not part of the supported public API.
     /// It exists solely as an internal utility and may change or be removed at any time.
-    /// /// </remarks>
+    /// </remarks>
     public static class WebRequestExtensions
     {
         /// <summary>

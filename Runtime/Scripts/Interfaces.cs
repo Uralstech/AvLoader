@@ -33,11 +33,11 @@ namespace Uralstech.AvLoader
     public interface IAvDataLoader 
     {
         /// <summary>
-        /// Tries loading an avatar into an <see cref="AvDataContainer"/>.
+        /// Tries loading an avatar into an <see cref="AvSourceData"/>.
         /// </summary>
         /// <param name="throwOnFail">Should this method throw errors on failures or log them as warnings and return <see langword="null"/>?</param>
         /// <returns>The loaded data if successful; <see langword="null"/> on failure.</returns>
-        public Awaitable<AvDataContainer?> LoadAvatarAsync(bool throwOnFail, CancellationToken token = default);
+        public Awaitable<AvSourceData?> LoadAvatarAsync(bool throwOnFail, CancellationToken token = default);
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ namespace Uralstech.AvLoader
         /// <param name="rawData">The raw avatar data to process.</param>
         /// <param name="throwOnFail">Should this method throw errors on failures or log them as warnings and return <see langword="null"/>?</param>
         /// <returns>The loaded avatar if successful; <see langword="null"/> on failure.</returns>
-        public Awaitable<LoadedAv?> ImportAvatarAsync(AvDataContainer rawData, bool throwOnFail, CancellationToken token = default);
+        public Awaitable<LoadedAv?> ImportAvatarAsync(AvSourceData rawData, bool throwOnFail, CancellationToken token = default);
     }
 
     /// <summary>
@@ -82,7 +82,7 @@ namespace Uralstech.AvLoader
         /// </summary>
         /// <param name="avatar">The loaded avatar to process.</param>
         /// <param name="rawData">The raw data of the loaded avatar.</param>
-        public void PostProcess(LoadedAv avatar, AvDataContainer rawData);
+        public void PostProcess(LoadedAv avatar, AvSourceData rawData);
     }
 
     /// <summary>
@@ -95,6 +95,6 @@ namespace Uralstech.AvLoader
         /// </summary>
         /// <param name="avatar">The loaded avatar to process.</param>
         /// <param name="rawData">The raw data of the loaded avatar.</param>
-        public Awaitable PostProcessAsync(LoadedAv avatar, AvDataContainer rawData, CancellationToken token = default);
+        public Awaitable PostProcessAsync(LoadedAv avatar, AvSourceData rawData, CancellationToken token = default);
     }
 }
