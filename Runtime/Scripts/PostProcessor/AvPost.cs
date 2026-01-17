@@ -134,5 +134,11 @@ namespace Uralstech.AvLoader.PostProcessors
             };
         }
 #endif
+
+        /// <summary>
+        /// Creates a post-processor that swaps shaders of the loaded avatar based on the given <paramref name="config"/>.
+        /// </summary>
+        /// <param name="config">Configuration that includes a map of shaders to be replaced and their replacements.</param>
+        public static ShaderSwapPostProcessor SwapShaders(ShaderSwapConfig config) => new(config);
     }
 }

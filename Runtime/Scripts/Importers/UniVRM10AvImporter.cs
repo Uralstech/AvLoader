@@ -14,6 +14,7 @@
 
 #if UNIVRM10_INSTALLED
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using UniGLTF;
 using UnityEngine;
@@ -91,13 +92,27 @@ namespace Uralstech.AvLoader.Importers
     {
         /// <summary>The VRM avatar.</summary>
         public readonly Vrm10Instance VRMInstance;
+        
+        /// <summary>The <see cref="RuntimeGltfInstance"/> component of the VRM avatar, if it exists.</summary>
+        public readonly RuntimeGltfInstance? GLTFInstance;
+
         private bool _disposed = false;
 
         public LoadedUniVRM10Av(GameObject gameObject, Vrm10Instance vrmInstance, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
             : base(gameObject, metadata, fullRender, bustRender, importerType)
         {
             VRMInstance = vrmInstance;
+            vrmInstance.TryGetComponent(out GLTFInstance);
         }
+
+        /// <inheritdoc/>
+        public override IReadOnlyList<Material>? TryGetAvatarMaterials() => GLTFInstance != null ? GLTFInstance.Materials : null;
+
+        /// <inheritdoc/>
+        public override IReadOnlyList<Mesh>? TryGetAvatarMeshes() => GLTFInstance != null ? GLTFInstance.Meshes : null;
+
+        /// <inheritdoc/>
+        public override IReadOnlyList<Renderer>? TryGetAvatarRenderers() => GLTFInstance != null ? GLTFInstance.Renderers : null;
 
         /// <inheritdoc/>
         public override void Dispose()

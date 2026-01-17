@@ -125,6 +125,21 @@ namespace Uralstech.AvLoader
                     AsyncPostProcessors = _asyncPostProcessors.ToArray(),
                 };
             }
+
+            /// <summary>Creates a copy of the builder.</summary>
+            /// <remarks>
+            /// The returned object is independent of the builder and will not
+            /// reflect subsequent changes made to this builder instance.
+            /// </remarks>
+            public Builder Copy()
+            {
+                Builder copy = new();
+                copy._loaders.AddRange(_loaders);
+                copy._importers.AddRange(_importers);
+                copy._postProcessors.AddRange(_postProcessors);
+                copy._asyncPostProcessors.AddRange(_asyncPostProcessors);
+                return copy;
+            }
         }
 
         /// <summary>

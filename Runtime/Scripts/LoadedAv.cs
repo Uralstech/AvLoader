@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
@@ -46,6 +47,15 @@ namespace Uralstech.AvLoader
             BustRender = bustRender;
             ImporterType = importerType;
         }
+
+        /// <summary>Tries to get all materials of an avatar.</summary>
+        public virtual IReadOnlyList<Material>? TryGetAvatarMaterials() => null;
+
+        /// <summary>Tries to get all renderers of an avatar.</summary>
+        public virtual IReadOnlyList<Renderer>? TryGetAvatarRenderers() => null;
+        
+        /// <summary>Tries to get all meshes of an avatar.</summary>
+        public virtual IReadOnlyList<Mesh>? TryGetAvatarMeshes() => null;
 
         /// <inheritdoc/>
         public abstract void Dispose();

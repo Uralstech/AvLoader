@@ -14,6 +14,7 @@
 
 #if GLTFAST_INSTALLED
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using GLTFast;
@@ -73,7 +74,7 @@ namespace Uralstech.AvLoader.Importers
                 return null;
             }
 
-            GameObject gameObject = new($"Avatar ({nameof(GLTFastAvImporter)})");
+            GameObject gameObject = new(rawData.Metadata.Id);
             gameObject.SetActive(false);
 
             if (await GetGameObjectInstantiatorAndDisposeOnFail(import, gameObject, throwOnFail) is not GameObjectInstantiator instantiator)
@@ -131,6 +132,31 @@ namespace Uralstech.AvLoader.Importers
             : base(gameObject, metadata, fullRender, bustRender, importerType)
         {
             Import = import;
+        }
+
+        /// <inheritdoc/>
+        public override IReadOnlyList<Material>? TryGetAvatarMaterials()
+        {
+            int count = Import.MaterialCount;
+            Material[] materials = new Material[count];
+            
+            for (int i = 0; i < count; i++)
+                materials[i] = Import.GetMaterial(i);
+
+            return materials;
+        }
+
+        /// <inheritdoc/>
+        public override IReadOnlyList<Mesh>? TryGetAvatarMeshes()
+        {
+            int count = Import.Meshes.Count;
+            Mesh[] meshes = new Mesh[count];
+
+            using IEnumerator<Mesh> meshEnumerator = Import.Meshes.GetEnumerator();
+            for (int i = 0; i < count && meshEnumerator.MoveNext(); i++)
+                meshes[i] = meshEnumerator.Current;
+            
+            return meshes;
         }
 
         /// <inheritdoc/>
