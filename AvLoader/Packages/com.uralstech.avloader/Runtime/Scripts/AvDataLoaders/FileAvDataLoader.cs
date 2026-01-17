@@ -108,7 +108,7 @@ namespace Uralstech.AvLoader.DataLoaders
         }
 
         /// <inheritdoc/>
-        public async Awaitable<AvDataContainer?> LoadAvatarAsync(bool throwOnFail, CancellationToken token = default)
+        public async Awaitable<AvSourceData?> LoadAvatarAsync(bool throwOnFail, CancellationToken token = default)
         {
             string? modelFilePath = _modelFilePath;
             AvModelFileExtension modelFormat = _modelFormat;
@@ -145,18 +145,18 @@ namespace Uralstech.AvLoader.DataLoaders
                 byte[]? fullRenderData = !string.IsNullOrEmpty(_fullRenderFilePath)
                     ? await File.ReadAllBytesAsync(fullRenderPath, token) : null;
 
-                if (fullRenderData is not null && !TryDecodeImage(fullRenderData, nameof(AvDataContainer.FullRender), throwOnFail, out fullRender))
+                if (fullRenderData is not null && !TryDecodeImage(fullRenderData, nameof(AvSourceData.FullRender), throwOnFail, out fullRender))
                     return null;
 
                 byte[]? bustRenderData = !string.IsNullOrEmpty(_bustRenderFilePath)
                     ? await File.ReadAllBytesAsync(bustRenderPath, token) : null;
 
 #pragma warning disable IDE0046 // Convert to conditional expression
-                if (bustRenderData is not null && !TryDecodeImage(bustRenderData, nameof(AvDataContainer.BustRender), throwOnFail, out bustRender))
+                if (bustRenderData is not null && !TryDecodeImage(bustRenderData, nameof(AvSourceData.BustRender), throwOnFail, out bustRender))
                     return null;
 #pragma warning restore IDE0046 // Convert to conditional expression
 
-                return new AvDataContainer(modelData, modelFormat, modelFilePath, metadata.Value, typeof(FileAvDataLoader), fullRender, bustRender);
+                return new AvSourceData(modelData, modelFormat, modelFilePath, metadata.Value, typeof(FileAvDataLoader), fullRender, bustRender);
             }
             catch (SystemException ex)
             {

@@ -21,7 +21,7 @@ namespace Uralstech.AvLoader
     /// <summary>
     /// Wrapper for a raw container of avatar data.
     /// </summary>
-    public class AvDataContainer
+    public class AvSourceData
     {
         /// <summary>The model as a byte[].</summary>
         public readonly byte[] Model;
@@ -44,7 +44,7 @@ namespace Uralstech.AvLoader
         /// <summary>The type of the data loader which created this.</summary>
         public readonly Type DataLoaderType;
 
-        public AvDataContainer(byte[] model, AvModelFileExtension modelFormat, string? modelPath, AvMetadata metadata,
+        public AvSourceData(byte[] model, AvModelFileExtension modelFormat, string? modelPath, AvMetadata metadata,
             Type dataLoaderType, Texture2D? fullRender = null, Texture2D? bustRender = null)
         {
             Model = model;

@@ -58,7 +58,7 @@ namespace Uralstech.AvLoader.Importers
             format is AvModelFileExtension.GLTF or AvModelFileExtension.GLB or AvModelFileExtension.GLTFAny;
 
         /// <inheritdoc/>
-        public async Awaitable<LoadedAv?> ImportAvatarAsync(AvDataContainer rawData, bool throwOnFail, CancellationToken token = default)
+        public async Awaitable<LoadedAv?> ImportAvatarAsync(AvSourceData rawData, bool throwOnFail, CancellationToken token = default)
         {
             GltfImport import = new(DownloadProvider, DeferAgent, MaterialGenerator, Logger);
             Uri? modelUri = !string.IsNullOrEmpty(rawData.ModelPath) ? new Uri(rawData.ModelPath) : null;

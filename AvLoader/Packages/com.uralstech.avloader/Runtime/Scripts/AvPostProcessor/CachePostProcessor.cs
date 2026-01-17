@@ -30,11 +30,11 @@ namespace Uralstech.AvLoader.PostProcessors
     /// </summary>
     /// <remarks>
     /// This only works for formats where the model does not depend on resources
-    /// stored separately from the source file (<see cref="AvDataContainer.Model"/>).
+    /// stored separately from the source file (<see cref="AvSourceData.Model"/>).
     /// For example, avatars loaded from OBJ files with external texture files
     /// will not work.
     /// </remarks>
-    public class CacheModelData : IAsyncAvPostProcessor
+    public class CachePostProcessor : IAsyncAvPostProcessor
     {
         /// <summary>
         /// The base directory to save the avatar to.
@@ -90,21 +90,21 @@ namespace Uralstech.AvLoader.PostProcessors
         /// </summary>
         public bool UseAvatarIdAsDirName;
 
-        public CacheModelData(string baseDirectory, bool useAvatarIdAsChildDirName = true)
+        public CachePostProcessor(string baseDirectory, bool useAvatarIdAsChildDirName = true)
         {
             BaseDirectory = baseDirectory;
             UseAvatarIdAsDirName = useAvatarIdAsChildDirName;
         }
 
         /// <inheritdoc/>
-        public async Awaitable PostProcessAsync(LoadedAv avatar, AvDataContainer rawData, CancellationToken token = default)
+        public async Awaitable PostProcessAsync(LoadedAv avatar, AvSourceData rawData, CancellationToken token = default)
         {
             if (!IgnoreOriginalLoaderType && rawData.DataLoaderType == typeof(FileAvDataLoader))
                 return;
 
             if (!IOUtils.s_modelFileExtensionToStringLookup.TryGetValue(rawData.ModelFormat, out string extension))
             {
-                Debug.LogError($"{nameof(CacheModelData)}: Could not save avatar due to unrecognized model format/extension: '{rawData.ModelFormat}'.");
+                Debug.LogError($"{nameof(CachePostProcessor)}: Could not save avatar due to unrecognized model format/extension: '{rawData.ModelFormat}'.");
                 return;
             }
 
@@ -133,11 +133,11 @@ namespace Uralstech.AvLoader.PostProcessors
             }
             catch (JsonException ex)
             {
-                Debug.LogError($"{nameof(CacheModelData)}: Could not save avatar due to JSON exception:\n'{ex}'.");
+                Debug.LogError($"{nameof(CachePostProcessor)}: Could not save avatar due to JSON exception:\n'{ex}'.");
             }
             catch (SystemException ex)
             {
-                Debug.LogError($"{nameof(CacheModelData)}: Could not save avatar due to system exception:\n'{ex}'.");
+                Debug.LogError($"{nameof(CachePostProcessor)}: Could not save avatar due to system exception:\n'{ex}'.");
             }
         }
 

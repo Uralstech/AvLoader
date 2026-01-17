@@ -58,7 +58,7 @@ namespace Uralstech.AvLoader.Importers
         public bool SupportsFormat(AvModelFileExtension format) => format is AvModelFileExtension.VRM;
 
         /// <inheritdoc/>
-        public async Awaitable<LoadedAv?> ImportAvatarAsync(AvDataContainer rawData, bool throwOnFail, CancellationToken token = default)
+        public async Awaitable<LoadedAv?> ImportAvatarAsync(AvSourceData rawData, bool throwOnFail, CancellationToken token = default)
         {
             try
             {

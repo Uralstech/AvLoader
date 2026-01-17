@@ -25,15 +25,15 @@ namespace Uralstech.AvLoader.PostProcessors
     public class ActionPostProcessor : IAvPostProcessor
     {
         /// <summary>The action to execute.</summary>
-        public Action<LoadedAv, AvDataContainer> Action;
+        public Action<LoadedAv, AvSourceData> Action;
 
-        public ActionPostProcessor(Action<LoadedAv, AvDataContainer> action)
+        public ActionPostProcessor(Action<LoadedAv, AvSourceData> action)
         {
             Action = action;
         }
 
         /// <inheritdoc/>
-        public void PostProcess(LoadedAv avatar, AvDataContainer rawData) => Action(avatar, rawData);
+        public void PostProcess(LoadedAv avatar, AvSourceData rawData) => Action(avatar, rawData);
     }
 
     /// <summary>
@@ -42,14 +42,14 @@ namespace Uralstech.AvLoader.PostProcessors
     public class AsyncFuncPostProcessor : IAsyncAvPostProcessor
     {
         /// <summary>The <see cref="Func{T1, T2, T3, TResult}"/> to execute.</summary>
-        public Func<LoadedAv, AvDataContainer, CancellationToken, Awaitable> Func;
+        public Func<LoadedAv, AvSourceData, CancellationToken, Awaitable> Func;
 
-        public AsyncFuncPostProcessor(Func<LoadedAv, AvDataContainer, CancellationToken, Awaitable> func)
+        public AsyncFuncPostProcessor(Func<LoadedAv, AvSourceData, CancellationToken, Awaitable> func)
         {
             Func = func;
         }
 
         /// <inheritdoc/>
-        public Awaitable PostProcessAsync(LoadedAv avatar, AvDataContainer rawData, CancellationToken token = default) => Func(avatar, rawData, token);
+        public Awaitable PostProcessAsync(LoadedAv avatar, AvSourceData rawData, CancellationToken token = default) => Func(avatar, rawData, token);
     }
 }

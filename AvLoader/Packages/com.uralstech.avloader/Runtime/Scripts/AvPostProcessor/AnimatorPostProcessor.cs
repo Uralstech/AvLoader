@@ -23,7 +23,7 @@ namespace Uralstech.AvLoader.PostProcessors
     /// Post-processing step which adds or updates an animation controller in the loaded avatar.
     /// Requries Unity's animation module to be enabled.
     /// </summary>
-    public class AddOrUpdateAnimationController : IAvPostProcessor
+    public class AnimatorPostProcessor : IAvPostProcessor
     {
         /// <summary>Runtime animator controller to assign to the loaded avatar.</summary>
         public RuntimeAnimatorController? AnimatorController;
@@ -49,7 +49,7 @@ namespace Uralstech.AvLoader.PostProcessors
         public bool OverrideAvatar;
 
         /// <inheritdoc/>
-        public void PostProcess(LoadedAv avatar, AvDataContainer _)
+        public void PostProcess(LoadedAv avatar, AvSourceData _)
         {
             if (!avatar.GameObject.TryGetComponent(out Animator animator))
                 animator = avatar.GameObject.AddComponent<Animator>();
