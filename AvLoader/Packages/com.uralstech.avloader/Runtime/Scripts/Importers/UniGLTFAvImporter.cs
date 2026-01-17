@@ -14,6 +14,7 @@
 
 #if UNIGLTF_INSTALLED
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using UniGLTF;
 using UnityEngine;
@@ -83,6 +84,15 @@ namespace Uralstech.AvLoader.Importers
         {
             GLTFInstance = gltfInstance;
         }
+
+        /// <inheritdoc/>
+        public override IReadOnlyList<Material>? TryGetAvatarMaterials() => GLTFInstance.Materials;
+
+        /// <inheritdoc/>
+        public override IReadOnlyList<Mesh>? TryGetAvatarMeshes() => GLTFInstance.Meshes;
+
+        /// <inheritdoc/>
+        public override IReadOnlyList<Renderer>? TryGetAvatarRenderers() => GLTFInstance.Renderers;
 
         /// <inheritdoc/>
         public override void Dispose()
