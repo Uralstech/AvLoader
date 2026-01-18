@@ -23,10 +23,43 @@ namespace Uralstech.AvLoader.PostProcessors
     /// Configuration data for <see cref="MaterialOverridePostProcessor"/>.
     /// </summary>
     [CreateAssetMenu(menuName = "AvLoader/Material Override Configuration")]
-    public class MaterialOverrideConfig : ScriptableObject
+    public class MaterialOverrideConfig : ScriptableObject, ISerializationCallbackReceiver
     {
-        [Tooltip("The list of material override definitions.")]
-        [SerializeField] internal List<MaterialOverrideDefinition> _materialOverrides;
+        /// <summary>Runtime map of source shaders to their material override definitions.</summary>
+        public Dictionary<Shader, RuntimeMaterialOverrideDefinition> MaterialOverrides = new();
 
+        [Tooltip("The list of material override definitions.")]
+        [SerializeField] internal List<EditorMaterialOverrideDefinition> _serializedMaterialOverrides = new();
+
+        internal bool _isValid;
+
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+            if (!_isValid) return;
+
+            _serializedMaterialOverrides.Clear();
+            foreach ((Shader key, RuntimeMaterialOverrideDefinition value) in MaterialOverrides)
+                _serializedMaterialOverrides.Add(value.Serialize(key));
+        }
+
+        void ISerializationCallbackReceiver.OnAfterDeserialize() => IsValid();
+
+        internal bool IsValid()
+        {
+            _isValid = true;
+            MaterialOverrides.Clear();
+
+            int count = _serializedMaterialOverrides.Count;
+            for (int i = 0; i < count; i++)
+            {
+                EditorMaterialOverrideDefinition definition = _serializedMaterialOverrides[i];
+                if (!ShaderKeywordMapping.IsValid(definition.KeywordMappings)
+                    || definition.Deserialize() is not RuntimeMaterialOverrideDefinition runtimeDefinition
+                    || !MaterialOverrides.TryAdd(definition.ShaderMapping!.Source!, runtimeDefinition))
+                    _isValid = false;
+            }
+
+            return _isValid;
+        }
     }
 }
