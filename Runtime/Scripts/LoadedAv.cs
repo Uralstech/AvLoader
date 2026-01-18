@@ -57,7 +57,26 @@ namespace Uralstech.AvLoader
         /// <summary>Tries to get all meshes of an avatar.</summary>
         public virtual IReadOnlyList<Mesh>? TryGetAvatarMeshes() => null;
 
+        private bool _disposed = false;
+
         /// <inheritdoc/>
-        public abstract void Dispose();
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
+
+            ImporterSpecificDispose();
+
+            if (FullRender != null)
+                UnityEngine.Object.Destroy(FullRender);
+
+            if (BustRender != null)
+                UnityEngine.Object.Destroy(BustRender);
+            
+            _disposed = true;
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void ImporterSpecificDispose() { }
     }
 }

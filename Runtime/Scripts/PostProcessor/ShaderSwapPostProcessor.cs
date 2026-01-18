@@ -52,7 +52,7 @@ namespace Uralstech.AvLoader.PostProcessors
             HashSet<Material> materialsSet = new();
             foreach (Renderer renderer in renderers)
             {
-                foreach (Material material in renderer.materials)
+                foreach (Material material in renderer.sharedMaterials)
                 {
                     if (materialsSet.Add(material))
                         yield return material;
