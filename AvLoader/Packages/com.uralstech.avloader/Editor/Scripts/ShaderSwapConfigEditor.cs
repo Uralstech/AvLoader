@@ -28,6 +28,8 @@ namespace Uralstech.AvLoader.Editor
             VisualElement root = new();
             ShaderSwapConfig config = (ShaderSwapConfig)target;
 
+            root.Add(new PropertyField(serializedObject.FindProperty(nameof(ShaderSwapConfig.FallbackShader))));
+
             SerializedProperty property = serializedObject.FindProperty(nameof(ShaderSwapConfig._serializedShaderMap));
             property.isExpanded = true;
             root.Add(new PropertyField(property, "Shader Map"));
@@ -48,34 +50,6 @@ namespace Uralstech.AvLoader.Editor
                 helpBox.style.display = config.IsValid() ? DisplayStyle.None : DisplayStyle.Flex;
             });
             
-            return root;
-        }
-    }
-
-    [CustomPropertyDrawer(typeof(ShaderSwapConfig.ShaderKVPair))]
-    public class ShaderKVPairPropertyDrawer : PropertyDrawer
-    {
-        public override VisualElement CreatePropertyGUI(SerializedProperty property)
-        {
-            VisualElement root = new();
-            root.style.flexDirection = FlexDirection.Row;
-
-            VisualElement key = new();
-            key.style.flexBasis = 0;
-            key.style.flexGrow = 1;
-
-            key.Add(new Label("Source"));
-            key.Add(new PropertyField(property.FindPropertyRelative(nameof(ShaderSwapConfig.ShaderKVPair._source)), ""));
-            root.Add(key);
-
-            VisualElement value = new();
-            value.style.flexBasis = 0;
-            value.style.flexGrow = 1;
-
-            value.Add(new Label("Target"));
-            value.Add(new PropertyField(property.FindPropertyRelative(nameof(ShaderSwapConfig.ShaderKVPair._target)), ""));
-            root.Add(value);
-
             return root;
         }
     }
