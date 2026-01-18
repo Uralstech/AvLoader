@@ -91,6 +91,10 @@ namespace Uralstech.AvLoader.PostProcessors
                         float floatVal = source.GetFloat(mapping.Source);
                         target.SetFloat(mapping.Target, floatVal); break;
 
+                    case ShaderPropertyType.Inverse01RangeFloat:
+                        float floatValInv = 1 - source.GetFloat(mapping.Source);
+                        target.SetFloat(mapping.Target, floatValInv); break;
+
                     case ShaderPropertyType.Vector:
                         Vector4 vectorVal = source.GetVector(mapping.Source);
                         target.SetVector(mapping.Target, vectorVal); break;

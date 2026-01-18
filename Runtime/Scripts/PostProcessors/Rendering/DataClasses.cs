@@ -228,6 +228,10 @@ namespace Uralstech.AvLoader.PostProcessors.Rendering
         Vector,
         Color,
         Texture,
-        Matrix
+        Matrix,
+
+        /// <summary>Inverts the float value in 0-1 range before assignment.</summary>
+        /// <remarks>E.g. assigning a "smoothness" factor to a shader that expects a "roughness" factor.</remarks>
+        Inverse01RangeFloat
     }
 }

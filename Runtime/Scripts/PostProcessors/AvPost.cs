@@ -140,5 +140,11 @@ namespace Uralstech.AvLoader.PostProcessors
         /// </summary>
         /// <param name="config">Configuration that includes a map of shaders to be replaced and their replacements.</param>
         public static ShaderSwapPostProcessor SwapShaders(ShaderSwapConfig config) => new(config);
+
+        /// <summary>
+        /// Creates a post-processor that recreates avatar materials using alternative shaders and applies configured property and keyword overrides.
+        /// </summary>
+        /// <param name="config">Configuration that defines material override rules, including source shaders, target shaders, and property and keyword mappings.</param>
+        public static MaterialOverridePostProcessor OverrideMaterials(MaterialOverrideConfig config) => new(config);
     }
 }
