@@ -14,10 +14,11 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using Uralstech.AvLoader.PostProcessors.Rendering;
 
 #nullable enable
 namespace Uralstech.AvLoader.PostProcessors
-{        
+{
     /// <summary>
     /// Configuration data for <see cref="ShaderSwapPostProcessor"/>.
     /// </summary>
@@ -32,7 +33,7 @@ namespace Uralstech.AvLoader.PostProcessors
         public Dictionary<Shader, Shader> ShaderMap = new();
 
         [Tooltip("Map of shaders to replace, where the source is the original shader and the target is the replacement shader.")]
-        [SerializeField] internal List<ShaderKVPair>? _serializedShaderMap;
+        [SerializeField] internal List<ShaderMapping>? _serializedShaderMap;
 
         internal bool _isValid;
 
@@ -42,7 +43,13 @@ namespace Uralstech.AvLoader.PostProcessors
 
             _serializedShaderMap.Clear();
             foreach ((Shader key, Shader value) in ShaderMap)
-                _serializedShaderMap.Add(new ShaderKVPair(key, value));
+            {
+                _serializedShaderMap.Add(new ShaderMapping()
+                {
+                    Source = key,
+                    Target = value,
+                });
+            }
         }
 
         void ISerializationCallbackReceiver.OnAfterDeserialize() => IsValid();
@@ -56,8 +63,8 @@ namespace Uralstech.AvLoader.PostProcessors
             int count = _serializedShaderMap.Count;
             for (int i = 0; i < count; i++)
             {
-                ShaderKVPair pair = _serializedShaderMap[i];
-                if (pair._source == null || pair._target == null || !ShaderMap.TryAdd(pair._source, pair._target))
+                ShaderMapping pair = _serializedShaderMap[i];
+                if (pair.Source == null || pair.Target == null || !ShaderMap.TryAdd(pair.Source, pair.Target))
                     _isValid = false;
             }
 
