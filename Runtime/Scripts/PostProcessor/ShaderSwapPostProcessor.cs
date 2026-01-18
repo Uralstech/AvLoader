@@ -41,6 +41,8 @@ namespace Uralstech.AvLoader.PostProcessors
             {
                 if (Configation.ShaderMap.TryGetValue(material.shader, out Shader swap))
                     material.shader = swap;
+                else if (Configation.FallbackShader != null)
+                    material.shader = Configation.FallbackShader;
             }
         }
 

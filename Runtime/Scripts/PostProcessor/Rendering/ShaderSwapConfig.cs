@@ -12,35 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
 namespace Uralstech.AvLoader.PostProcessors
-{
+{        
     /// <summary>
     /// Configuration data for <see cref="ShaderSwapPostProcessor"/>.
     /// </summary>
     [CreateAssetMenu(menuName = "AvLoader/Shader Swap Configuration")]
     public class ShaderSwapConfig : ScriptableObject, ISerializationCallbackReceiver
     {
-        [Serializable]
-        internal class ShaderKVPair
-        {
-            [SerializeField, Tooltip("The shader to be replaced by \"Target\".")] internal Shader? _source;
-            [SerializeField, Tooltip("The shader that will replace \"Source\".")] internal Shader? _target;
+        /// <summary>Optional fallback shader used when a shader is not defined in the shader map sources.</summary>
+        [Tooltip("Optional fallback shader used when a shader is not defined in the shader map sources.")]
+        public Shader? FallbackShader;
 
-            public ShaderKVPair() { }
-            public ShaderKVPair(Shader source, Shader target)
-            {
-                _source = source;
-                _target = target;
-            }
-        }
-
-        /// <summary>Map of shaders with Key: Shader to replace, Value: New shader.</summary>
+        /// <summary>Map of shaders to replace, where the key is the original shader and the value is the replacement shader.</summary>
         public Dictionary<Shader, Shader> ShaderMap = new();
+
+        [Tooltip("Map of shaders to replace, where the source is the original shader and the target is the replacement shader.")]
         [SerializeField] internal List<ShaderKVPair>? _serializedShaderMap;
 
         internal bool _isValid;
