@@ -36,7 +36,7 @@ namespace Uralstech.AvLoader.Editor
                 "Invalid material override configuration.\n" + 
                 "- Each source shader must be unique.\n" +
                 "- Source and target shaders must be assigned.\n" +
-                "- All property and keyword mappings must be valid.",
+                "- All property and keyword mappings and rules must be valid.",
                 HelpBoxMessageType.Error
             );
 
