@@ -20,24 +20,23 @@ using Uralstech.AvLoader.PostProcessors;
 #nullable enable
 namespace Uralstech.AvLoader.Editor
 {
-    [CustomEditor(typeof(ShaderSwapConfig))]
-    public class ShaderSwapConfigEditor : UnityEditor.Editor
+    [CustomEditor(typeof(MaterialOverrideConfig))]
+    public class MaterialOverrideConfigEditor : UnityEditor.Editor
     {
         public override VisualElement CreateInspectorGUI()
         {
             VisualElement root = new();
-            ShaderSwapConfig config = (ShaderSwapConfig)target;
+            MaterialOverrideConfig config = (MaterialOverrideConfig)target;
 
-            root.Add(new PropertyField(serializedObject.FindProperty(nameof(ShaderSwapConfig.FallbackShader))));
-
-            SerializedProperty property = serializedObject.FindProperty(nameof(ShaderSwapConfig._serializedShaderMap));
+            SerializedProperty property = serializedObject.FindProperty(nameof(MaterialOverrideConfig._serializedMaterialOverrides));
             property.isExpanded = true;
-            root.Add(new PropertyField(property, "Shader Map"));
+            root.Add(new PropertyField(property, "Material Overrides"));
 
             HelpBox helpBox = new(
-                "Invalid shader swap configuration.\n" +
+                "Invalid material override configuration.\n" + 
                 "- Each source shader must be unique.\n" +
-                "- Source and target shaders must be assigned.",
+                "- Source and target shaders must be assigned.\n" +
+                "- All property and keyword mappings must be valid.",
                 HelpBoxMessageType.Error
             );
 
@@ -51,7 +50,7 @@ namespace Uralstech.AvLoader.Editor
 
                 helpBox.style.display = config.IsValid() ? DisplayStyle.None : DisplayStyle.Flex;
             });
-            
+
             return root;
         }
     }

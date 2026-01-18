@@ -25,21 +25,21 @@ namespace Uralstech.AvLoader.PostProcessors
     [CreateAssetMenu(menuName = "AvLoader/Shader Swap Configuration")]
     public class ShaderSwapConfig : ScriptableObject, ISerializationCallbackReceiver
     {
-        /// <summary>Optional fallback shader used when a shader is not defined in the shader map sources.</summary>
-        [Tooltip("Optional fallback shader used when a shader is not defined in the shader map sources.")]
+        /// <summary>Optional shader used when no entry exists in <see cref="ShaderMap"/>.</summary>
+        [Tooltip("Optional shader used when no entry exists in the shader map")]
         public Shader? FallbackShader;
 
-        /// <summary>Map of shaders to replace, where the key is the original shader and the value is the replacement shader.</summary>
+        /// <summary>Maps source shaders to their replacement shaders.</summary>
         public Dictionary<Shader, Shader> ShaderMap = new();
 
         [Tooltip("Map of shaders to replace, where the source is the original shader and the target is the replacement shader.")]
-        [SerializeField] internal List<ShaderMapping>? _serializedShaderMap;
+        [SerializeField] internal List<ShaderMapping> _serializedShaderMap = new();
 
         internal bool _isValid;
 
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
-            if (!_isValid || _serializedShaderMap == null) return;
+            if (!_isValid) return;
 
             _serializedShaderMap.Clear();
             foreach ((Shader key, Shader value) in ShaderMap)
@@ -58,13 +58,12 @@ namespace Uralstech.AvLoader.PostProcessors
         {
             _isValid = true;
             ShaderMap.Clear();
-            if (_serializedShaderMap == null) return true;
 
             int count = _serializedShaderMap.Count;
             for (int i = 0; i < count; i++)
             {
                 ShaderMapping pair = _serializedShaderMap[i];
-                if (pair.Source == null || pair.Target == null || !ShaderMap.TryAdd(pair.Source, pair.Target))
+                if (!pair.IsValid() || !ShaderMap.TryAdd(pair.Source!, pair.Target!))
                     _isValid = false;
             }
 
