@@ -37,11 +37,13 @@ namespace Uralstech.AvLoader.PostProcessors
             IEnumerable<Material>? materials = avatar.TryGetAvatarMaterials();
             materials ??= GetMaterialsFromRenderers(avatar);
 
-            foreach (Material material in materials)
+            foreach (Material? material in materials)
             {
+                if (material == null) continue;
+
                 if (Configuration.ShaderMap.TryGetValue(material.shader, out Shader swap))
                     material.shader = swap;
-                else if (Configuration.FallbackShader != null)
+                else if (Configuration.FallbackShader != null && material.shader != Configuration.FallbackShader)
                     material.shader = Configuration.FallbackShader;
             }
         }
