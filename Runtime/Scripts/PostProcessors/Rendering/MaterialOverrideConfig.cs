@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Uralstech.AvLoader.PostProcessors.Rendering;
 
 #nullable enable
 namespace Uralstech.AvLoader.PostProcessors
 {
-    [Serializable]
-    internal class ShaderKVPair
+    /// <summary>
+    /// Configuration data for <see cref="MaterialOverridePostProcessor"/>.
+    /// </summary>
+    [CreateAssetMenu(menuName = "AvLoader/Material Override Configuration")]
+    public class MaterialOverrideConfig : ScriptableObject
     {
-        [SerializeField] internal Shader? _source;
-        [SerializeField] internal Shader? _target;
+        [Tooltip("The list of material override definitions.")]
+        [SerializeField] internal List<MaterialOverrideDefinition> _materialOverrides;
 
-        public ShaderKVPair() { }
-        public ShaderKVPair(Shader source, Shader target)
-        {
-            _source = source;
-            _target = target;
-        }
     }
 }

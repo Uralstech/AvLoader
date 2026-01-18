@@ -15,13 +15,13 @@
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-using Uralstech.AvLoader.PostProcessors;
+using Uralstech.AvLoader.PostProcessors.Rendering;
 
 #nullable enable
 namespace Uralstech.AvLoader.Editor
 {
-    [CustomPropertyDrawer(typeof(ShaderKVPair))]
-    public class ShaderKVPairPropertyDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(ShaderMapping))]
+    public class ShaderMappingPropertyDrawer : PropertyDrawer
     {
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
@@ -33,7 +33,7 @@ namespace Uralstech.AvLoader.Editor
             key.style.flexGrow = 1;
 
             key.Add(new Label("Source"));
-            key.Add(new PropertyField(property.FindPropertyRelative(nameof(ShaderKVPair._source)), ""));
+            key.Add(new PropertyField(property.FindPropertyRelative(nameof(ShaderMapping.Source)), ""));
             root.Add(key);
 
             VisualElement value = new();
@@ -41,7 +41,7 @@ namespace Uralstech.AvLoader.Editor
             value.style.flexGrow = 1;
 
             value.Add(new Label("Target"));
-            value.Add(new PropertyField(property.FindPropertyRelative(nameof(ShaderKVPair._target)), ""));
+            value.Add(new PropertyField(property.FindPropertyRelative(nameof(ShaderMapping.Target)), ""));
             root.Add(value);
 
             return root;
