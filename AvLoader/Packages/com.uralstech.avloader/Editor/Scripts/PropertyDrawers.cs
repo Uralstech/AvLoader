@@ -141,6 +141,20 @@ namespace Uralstech.AvLoader.Editor
         }
     }
 
+    [CustomPropertyDrawer(typeof(ShaderKeywordMapping))]
+    public class ShaderKeywordMappingPropertyDrawer : PropertyDrawer
+    {
+        public override VisualElement CreatePropertyGUI(SerializedProperty property)
+        {
+            VisualElement root = new();
+            root.style.flexDirection = FlexDirection.Row;
+
+            root.AddTwoRowPropertyField(property, nameof(ShaderKeywordMapping.Source), "Source");
+            root.AddTwoRowPropertyField(property, nameof(ShaderKeywordMapping.Target), "Target");
+            return root;
+        }
+    }
+
     [CustomPropertyDrawer(typeof(ShaderKeywordRule))]
     public class ShaderKeywordRulePropertyDrawer : PropertyDrawer
     {
