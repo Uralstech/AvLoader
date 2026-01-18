@@ -43,18 +43,18 @@ namespace Uralstech.AvLoader.Editor
             root.TrackPropertyValue(propertyMappings, p => ValidatePropertyMappings(p, propertyMappingsHelpBox));
             root.Add(propertyMappingsHelpBox);
 
-            SerializedProperty keywordMappings = property.FindPropertyRelative(nameof(EditorMaterialOverrideDefinition.KeywordMappings));
-            root.Add(new PropertyField(keywordMappings, "Keyword Mappings (Advanced)"));
+            SerializedProperty keywordRules = property.FindPropertyRelative(nameof(EditorMaterialOverrideDefinition.KeywordRules));
+            root.Add(new PropertyField(keywordRules, "Keyword Rules (Advanced)"));
 
-            HelpBox keywordMappingsHelpBox = new(
-                "Invalid keyword mappings.\n" +
+            HelpBox keywordRulesHelpBox = new(
+                "Invalid keyword rules.\n" +
                 "- Source and target keyword names must not be empty.",
                 HelpBoxMessageType.Error
             );
 
-            ValidateKeywordMappings(keywordMappings, keywordMappingsHelpBox);
-            root.TrackPropertyValue(keywordMappings, p => ValidateKeywordMappings(p, keywordMappingsHelpBox));
-            root.Add(keywordMappingsHelpBox);
+            ValidateKeywordRules(keywordRules, keywordRulesHelpBox);
+            root.TrackPropertyValue(keywordRules, p => ValidateKeywordRules(p, keywordRulesHelpBox));
+            root.Add(keywordRulesHelpBox);
             return root;
         }
 
@@ -82,7 +82,7 @@ namespace Uralstech.AvLoader.Editor
             }
         }
 
-        private static void ValidateKeywordMappings(SerializedProperty property, HelpBox helpBox)
+        private static void ValidateKeywordRules(SerializedProperty property, HelpBox helpBox)
         {
             helpBox.style.display = DisplayStyle.None;
             if (property.arraySize == 0)
@@ -92,8 +92,8 @@ namespace Uralstech.AvLoader.Editor
             for (int i = 0; i < count; i++)
             {
                 SerializedProperty element = property.GetArrayElementAtIndex(i);
-                string source = element.FindPropertyRelative(nameof(ShaderKeywordMapping.Source)).stringValue;
-                string target = element.FindPropertyRelative(nameof(ShaderKeywordMapping.Target)).stringValue;
+                string source = element.FindPropertyRelative(nameof(ShaderKeywordRule.Source)).stringValue;
+                string target = element.FindPropertyRelative(nameof(ShaderKeywordRule.Target)).stringValue;
 
                 if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(target))
                 {
@@ -118,19 +118,19 @@ namespace Uralstech.AvLoader.Editor
         }
     }
 
-    [CustomPropertyDrawer(typeof(ShaderKeywordMapping))]
-    public class ShaderKeywordMappingPropertyDrawer : PropertyDrawer
+    [CustomPropertyDrawer(typeof(ShaderKeywordRule))]
+    public class ShaderKeywordRulePropertyDrawer : PropertyDrawer
     {
         public override VisualElement CreatePropertyGUI(SerializedProperty property)
         {
             VisualElement root = new();
             root.style.flexDirection = FlexDirection.Row;
 
-            root.AddTwoRowPropertyField(property, nameof(ShaderKeywordMapping.Source), "Source");
-            root.AddTwoRowBoolField(property, nameof(ShaderKeywordMapping.SourceRequiredState));
+            root.AddTwoRowPropertyField(property, nameof(ShaderKeywordRule.Source), "Source");
+            root.AddTwoRowBoolField(property, nameof(ShaderKeywordRule.SourceRequiredState));
 
-            root.AddTwoRowPropertyField(property, nameof(ShaderKeywordMapping.Target), "Target");
-            root.AddTwoRowBoolField(property, nameof(ShaderKeywordMapping.TargetResultState));
+            root.AddTwoRowPropertyField(property, nameof(ShaderKeywordRule.Target), "Target");
+            root.AddTwoRowBoolField(property, nameof(ShaderKeywordRule.TargetResultState));
             return root;
         }
     }

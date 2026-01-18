@@ -56,8 +56,8 @@ namespace Uralstech.AvLoader.PostProcessors
                     avatar.DestroyOnDispose.Add(target);
 
                     ApplyProperties(overrideDefinition.PropertyMappings, source, target);
-                    if (overrideDefinition.KeywordMappings is not null)
-                        ApplyKeywords(overrideDefinition.KeywordMappings, source, target);
+                    if (overrideDefinition.KeywordRules is not null)
+                        ApplyKeywordRules(overrideDefinition.KeywordRules, source, target);
 
                     materials[i] = target;
                     updated++;
@@ -117,28 +117,28 @@ namespace Uralstech.AvLoader.PostProcessors
             }
         }
 
-        private void ApplyKeywords(IReadOnlyList<ShaderKeywordMapping> keywordMappings, Material source, Material target)
+        private void ApplyKeywordRules(IReadOnlyList<ShaderKeywordRule> keywordRules, Material source, Material target)
         {
-            int count = keywordMappings.Count;
+            int count = keywordRules.Count;
             for (int i = 0; i < count; i++)
             {
-                ShaderKeywordMapping mapping = keywordMappings[i];
-                UnityEngine.Rendering.LocalKeyword sourceKw = source.shader.keywordSpace.FindKeyword(mapping.Source);
+                ShaderKeywordRule rule = keywordRules[i];
+                UnityEngine.Rendering.LocalKeyword sourceKw = source.shader.keywordSpace.FindKeyword(rule.Source);
                 if (!sourceKw.isValid)
                 {
-                    Debug.LogWarning($"{nameof(MaterialOverridePostProcessor)}: Source material with shader {source.shader.name} does not have valid keyword '{mapping.Source}'.");
+                    Debug.LogWarning($"{nameof(MaterialOverridePostProcessor)}: Source material with shader {source.shader.name} does not have valid keyword '{rule.Source}'.");
                     continue;
                 }
 
-                UnityEngine.Rendering.LocalKeyword targetKw = target.shader.keywordSpace.FindKeyword(mapping.Target);
+                UnityEngine.Rendering.LocalKeyword targetKw = target.shader.keywordSpace.FindKeyword(rule.Target);
                 if (!targetKw.isValid)
                 {
-                    Debug.LogWarning($"{nameof(MaterialOverridePostProcessor)}: Target material with shader {target.shader.name} does not have valid keyword '{mapping.Target}'.");
+                    Debug.LogWarning($"{nameof(MaterialOverridePostProcessor)}: Target material with shader {target.shader.name} does not have valid keyword '{rule.Target}'.");
                     continue;
                 }
 
-                if (source.IsKeywordEnabled(in sourceKw) == mapping.SourceRequiredState)
-                    target.SetKeyword(in targetKw, mapping.TargetResultState);
+                if (source.IsKeywordEnabled(in sourceKw) == rule.SourceRequiredState)
+                    target.SetKeyword(in targetKw, rule.TargetResultState);
             }
         }
     }

@@ -24,11 +24,15 @@ namespace Uralstech.AvLoader.Editor
         public static void AddTwoRowPropertyField(this VisualElement current, SerializedProperty drawing, string relativePropertyName, string label, int? w = null)
         {
             VisualElement baseElement = new();
-            baseElement.style.flexBasis = 0;
-            baseElement.style.flexGrow = 1;
-
             if (w is int width)
+            {
                 baseElement.style.width = width;
+            }
+            else
+            {
+                baseElement.style.flexBasis = 0;
+                baseElement.style.flexGrow = 1;
+            }
 
             baseElement.Add(new Label(label));
             baseElement.Add(new PropertyField(drawing.FindPropertyRelative(relativePropertyName), ""));
