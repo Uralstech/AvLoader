@@ -126,7 +126,6 @@ namespace Uralstech.AvLoader.Importers
     {
         /// <summary>The glTFast import associated with the avatar.</summary>
         public readonly GltfImport Import;
-        private bool _disposed = false;
 
         public LoadedGLTFastAv(GameObject gameObject, GltfImport import, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
             : base(gameObject, metadata, fullRender, bustRender, importerType)
@@ -159,17 +158,10 @@ namespace Uralstech.AvLoader.Importers
             return meshes;
         }
 
-        /// <inheritdoc/>
-        public override void Dispose()
+        protected override void ImporterSpecificDispose()
         {
-            if (_disposed)
-                return;
-
             UnityEngine.Object.Destroy(GameObject);
             Import.Dispose();
-            _disposed = true;
-
-            GC.SuppressFinalize(this);
         }
     }
 }

@@ -77,7 +77,6 @@ namespace Uralstech.AvLoader.Importers
     {
         /// <summary>The glTF avatar.</summary>
         public readonly RuntimeGltfInstance GLTFInstance;
-        private bool _disposed = false;
 
         public LoadedUniGLTFAv(GameObject gameObject, RuntimeGltfInstance gltfInstance, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
             : base(gameObject, metadata, fullRender, bustRender, importerType)
@@ -94,17 +93,7 @@ namespace Uralstech.AvLoader.Importers
         /// <inheritdoc/>
         public override IReadOnlyList<Renderer>? TryGetAvatarRenderers() => GLTFInstance.Renderers;
 
-        /// <inheritdoc/>
-        public override void Dispose()
-        {
-            if (_disposed)
-                return;
-
-            GLTFInstance.Dispose();
-            _disposed = true;
-
-            GC.SuppressFinalize(this);
-        }
+        protected override void ImporterSpecificDispose() => GLTFInstance.Dispose();
     }
 }
 #endif

@@ -96,8 +96,6 @@ namespace Uralstech.AvLoader.Importers
         /// <summary>The <see cref="RuntimeGltfInstance"/> component of the VRM avatar, if it exists.</summary>
         public readonly RuntimeGltfInstance? GLTFInstance;
 
-        private bool _disposed = false;
-
         public LoadedUniVRM10Av(GameObject gameObject, Vrm10Instance vrmInstance, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
             : base(gameObject, metadata, fullRender, bustRender, importerType)
         {
@@ -114,17 +112,10 @@ namespace Uralstech.AvLoader.Importers
         /// <inheritdoc/>
         public override IReadOnlyList<Renderer>? TryGetAvatarRenderers() => GLTFInstance != null ? GLTFInstance.Renderers : null;
 
-        /// <inheritdoc/>
-        public override void Dispose()
+        protected override void ImporterSpecificDispose()
         {
-            if (_disposed)
-                return;
-
             UnityEngine.Object.Destroy(GameObject);
             VRMInstance.DisposeRuntime();
-            _disposed = true;
-
-            GC.SuppressFinalize(this);
         }
     }
 }
