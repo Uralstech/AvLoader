@@ -24,11 +24,11 @@ namespace Uralstech.AvLoader.PostProcessors
     public class ShaderSwapPostProcessor : IAvPostProcessor
     {
         /// <summary>Configuration which defines the shaders to swap.</summary>
-        public ShaderSwapConfig Configation;
+        public ShaderSwapConfig Configuration;
 
-        public ShaderSwapPostProcessor(ShaderSwapConfig configation)
+        public ShaderSwapPostProcessor(ShaderSwapConfig configuration)
         {
-            Configation = configation;
+            Configuration = configuration;
         }
 
         /// <inheritdoc/>
@@ -39,10 +39,10 @@ namespace Uralstech.AvLoader.PostProcessors
 
             foreach (Material material in materials)
             {
-                if (Configation.ShaderMap.TryGetValue(material.shader, out Shader swap))
+                if (Configuration.ShaderMap.TryGetValue(material.shader, out Shader swap))
                     material.shader = swap;
-                else if (Configation.FallbackShader != null)
-                    material.shader = Configation.FallbackShader;
+                else if (Configuration.FallbackShader != null)
+                    material.shader = Configuration.FallbackShader;
             }
         }
 

@@ -36,6 +36,10 @@ namespace Uralstech.AvLoader
         /// <summary>Optional bust render of the avatar.</summary>
         public readonly Texture2D? BustRender;
         
+        /// <summary>A list of Unity objects to be destroyed when the avatar is disposed, e.g. post-processor created <see cref="Material"/>s.</summary>
+        /// <remarks><see cref="FullRender"/> and <see cref="BustRender"/> are automatically added to this.</remarks>
+        public readonly List<UnityEngine.Object> DestroyOnDispose;
+
         /// <summary>The type of the importer which created this <see cref="LoadedAv"/>.</summary>
         public readonly Type ImporterType;
 
@@ -46,6 +50,10 @@ namespace Uralstech.AvLoader
             FullRender = fullRender;
             BustRender = bustRender;
             ImporterType = importerType;
+            DestroyOnDispose = new List<UnityEngine.Object>();
+
+            if (FullRender != null) DestroyOnDispose.Add(FullRender);
+            if (BustRender != null) DestroyOnDispose.Add(BustRender);
         }
 
         /// <summary>Tries to get all materials of an avatar.</summary>
@@ -66,12 +74,8 @@ namespace Uralstech.AvLoader
                 return;
 
             ImporterSpecificDispose();
-
-            if (FullRender != null)
-                UnityEngine.Object.Destroy(FullRender);
-
-            if (BustRender != null)
-                UnityEngine.Object.Destroy(BustRender);
+            foreach (UnityEngine.Object obj in DestroyOnDispose)
+                UnityEngine.Object.Destroy(obj);
             
             _disposed = true;
             GC.SuppressFinalize(this);
