@@ -37,8 +37,8 @@ namespace Uralstech.AvLoader.PostProcessors.Rendering
     }
 
     /// <summary>
-    /// Runtime definition describing how a material using a given shader
-    /// should be recreated using a different shader and mapped properties.
+    /// Defines how a material using a specific shader is recreated
+    /// using another shader, with selected properties and keywords copied.
     /// </summary>
     public class RuntimeMaterialOverrideDefinition
     {
@@ -46,14 +46,10 @@ namespace Uralstech.AvLoader.PostProcessors.Rendering
         public Shader Target;
 
         /// <summary>
-        /// Defines how shader property values are transferred from the source material
+        /// Property mappings used to copy values from the source material
         /// to the newly created material.
         /// </summary>
-        /// <remarks>
-        /// Each mapping specifies a source property name, a target property name, and the shared property type.
-        /// Source and target property names must both be non-empty and unique.
-        /// </remarks>
-        /// <exception cref="ArgumentException">Thrown if any source or target property name is <see langword="null"/>/empty, or if duplicates are detected.</exception>
+        /// <exception cref="ArgumentException">Thrown if any mapping is invalid or if duplicate source or target properties are found.</exception>
         public IReadOnlyList<ShaderPropertyMapping> PropertyMappings
         {
             get => _propertyMappings;
@@ -65,34 +61,56 @@ namespace Uralstech.AvLoader.PostProcessors.Rendering
         }
 
         /// <summary>
-        /// Optional rules that control how shader keywords are transferred
-        /// or conditionally enabled on the new material.
+        /// Optional keyword mappings that directly copy enabled/disabled states
+        /// from source keywords to target keywords.
         /// </summary>
-        /// <exception cref="ArgumentException">Thrown if any keyword rule contains an empty or <see langword="null"/> source or target.</exception>
+        /// <remarks>For conditional or overridden behavior, use <see cref="KeywordRules"/> instead.</remarks>
+        /// <exception cref="ArgumentException">Thrown if any mapping is invalid or if duplicate source or target keywords are found.</exception>
+        public IReadOnlyList<ShaderKeywordMapping>? KeywordMappings
+        {
+            get => _keywordMappings;
+            set
+            {
+                if (!ShaderKeywordMapping.IsValid(value))
+                    throw new ArgumentException("Found invalid shader keyword mapping with empty/null source or target, or duplicate entries.", nameof(value));
+                _keywordMappings = value?.CreateCopy();
+            }
+        }
+
+        /// <summary>
+        /// Optional rules that conditionally enable or disable shader keywords on the new material.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if any rule has an empty or null source or target keyword.</exception>
         public IReadOnlyList<ShaderKeywordRule>? KeywordRules
         {
             get => _keywordRules;
             set
             {
-                if (value is not null && !ShaderKeywordRule.IsValid(value))
+                if (!ShaderKeywordRule.IsValid(value))
                     throw new ArgumentException("Found invalid shader keyword rule with empty/null source or target.", nameof(value));
                 _keywordRules = value?.CreateCopy();
             }
         }
 
-        internal IReadOnlyList<ShaderKeywordRule>? _keywordRules;
         internal IReadOnlyList<ShaderPropertyMapping> _propertyMappings;
+        internal IReadOnlyList<ShaderKeywordMapping>? _keywordMappings;
+        internal IReadOnlyList<ShaderKeywordRule>? _keywordRules;
 
 #pragma warning disable CS8618
         internal RuntimeMaterialOverrideDefinition() { }
 #pragma warning restore CS8618
 
-        public RuntimeMaterialOverrideDefinition(Shader target, IReadOnlyList<ShaderPropertyMapping> propertyMappings, IReadOnlyList<ShaderKeywordRule>? keywordRules = null)
+        public RuntimeMaterialOverrideDefinition(Shader target, IReadOnlyList<ShaderPropertyMapping> propertyMappings,
+            IReadOnlyList<ShaderKeywordMapping>? keywordMappings = null, IReadOnlyList<ShaderKeywordRule>? keywordRules = null)
         {
             Target = target;
 
             ValidatePropertyMappings(propertyMappings, nameof(propertyMappings));
             _propertyMappings = propertyMappings.CreateCopy();
+
+            if (!ShaderKeywordMapping.IsValid(keywordMappings))
+                throw new ArgumentException("Found invalid shader keyword mapping with empty/null source or target, or duplicate entries.", nameof(keywordMappings));
+            _keywordMappings = keywordMappings?.CreateCopy();
 
             if (keywordRules is not null && !ShaderKeywordRule.IsValid(keywordRules))
                 throw new ArgumentException("Found invalid shader keyword rule with empty/null source or target.", nameof(keywordRules));
@@ -122,6 +140,9 @@ namespace Uralstech.AvLoader.PostProcessors.Rendering
             {
                 ShaderMapping = new ShaderMapping() { Source = key, Target = Target },
                 PropertyMappings = new List<ShaderPropertyMapping>(_propertyMappings),
+                KeywordMappings = _keywordMappings is not null
+                    ? new List<ShaderKeywordMapping>(_keywordMappings)
+                    : new List<ShaderKeywordMapping>(),
                 KeywordRules = _keywordRules is not null
                     ? new List<ShaderKeywordRule>(_keywordRules)
                     : new List<ShaderKeywordRule>()
@@ -138,12 +159,19 @@ namespace Uralstech.AvLoader.PostProcessors.Rendering
                  "Only the properties listed here are transferred. All others use the target shader's default values.")]
         public List<ShaderPropertyMapping> PropertyMappings = new();
 
+        [Tooltip("Mappings that directly copy the enabled/disabled state of shader keywords from the source material to the target material. " +
+                 "Each source and each target keyword must be unique. For conditional behavior, use Keyword Rules instead.")]
+        public List<ShaderKeywordMapping> KeywordMappings = new();
+
         [Tooltip("Conditional rules that control shader keyword states on the newly created material.")]
         public List<ShaderKeywordRule> KeywordRules = new();
 
         public RuntimeMaterialOverrideDefinition? Deserialize()
         {
-            if (ShaderMapping == null || !ShaderMapping.IsValid())
+            if (ShaderMapping == null
+                || !ShaderMapping.IsValid()
+                || !ShaderKeywordMapping.IsValid(KeywordMappings)
+                || !ShaderKeywordRule.IsValid(KeywordRules))
                 return null;
 
             HashSet<string> sourcesSet = new(PropertyMappings.Count);
@@ -159,8 +187,9 @@ namespace Uralstech.AvLoader.PostProcessors.Rendering
             return new RuntimeMaterialOverrideDefinition()
             {
                 Target = ShaderMapping!.Target!,
-                _propertyMappings = new List<ShaderPropertyMapping>(PropertyMappings),
-                _keywordRules = KeywordRules.Count != 0 ? new List<ShaderKeywordRule>(KeywordRules) : null,
+                _propertyMappings = PropertyMappings.CreateCopy(),
+                _keywordMappings = KeywordMappings.Count != 0 ? KeywordMappings.CreateCopy() : null,
+                _keywordRules = KeywordRules.Count != 0 ? KeywordRules.CreateCopy() : null,
             };
         }
     }
@@ -185,8 +214,49 @@ namespace Uralstech.AvLoader.PostProcessors.Rendering
     }
 
     /// <summary>
-    /// Defines a conditional rule for transferring or overriding a shader keyword.
+    /// Describes how a single shader keyword is copied from a source material to a target material.
     /// </summary>
+    /// <remarks>
+    /// Use <see cref="ShaderKeywordRule"/> for conditional behavior.
+    /// A mapping directly mirrors the enabled state of <see cref="Source"/> onto <see cref="Target"/>.
+    /// </remarks>
+    [Serializable]
+    public class ShaderKeywordMapping
+    {
+        /// <summary>The name of the keyword on the source shader.</summary>
+        public string? Source;
+
+        /// <summary>The name of the corresponding keyword on the target shader.</summary>
+        public string? Target;
+
+        /// <summary>Returns <see langword="true"/> if both source and target keyword names are non-empty.</summary>
+        public bool IsValid() => !string.IsNullOrEmpty(Source) && !string.IsNullOrEmpty(Target);
+
+        /// <summary>Returns <see langword="true"/> if all keyword mappings in the list are valid and contain no duplicates.</summary>
+        public static bool IsValid(IReadOnlyList<ShaderKeywordMapping>? mappings)
+        {
+            if (mappings is null || mappings.Count == 0)
+                return true;
+
+            HashSet<string> sourcesSet = new(mappings.Count);
+            HashSet<string> targetsSet = new(mappings.Count);
+            foreach (ShaderKeywordMapping mapping in mappings)
+            {
+                if (!mapping.IsValid() || !sourcesSet.Add(mapping.Source!) || !targetsSet.Add(mapping.Target!))
+                    return false;
+            }
+
+            return true;
+        }
+    }
+
+    /// <summary>
+    /// Defines a conditional rule that enables or disables a target shader keyword based on the state of a source keyword.
+    /// </summary>
+    /// <remarks>
+    /// If you want to copy the enabled/disabled state of a keyword to another one,
+    /// use <see cref="ShaderKeywordMapping"/> instead.
+    /// </remarks>
     [Serializable]
     public class ShaderKeywordRule
     {
@@ -206,8 +276,11 @@ namespace Uralstech.AvLoader.PostProcessors.Rendering
         public bool IsValid() => !string.IsNullOrEmpty(Source) && !string.IsNullOrEmpty(Target);
 
         /// <summary>Returns <see langword="true"/> if all keyword rules in the list are valid.</summary>
-        public static bool IsValid(IReadOnlyList<ShaderKeywordRule> rules)
+        public static bool IsValid(IReadOnlyList<ShaderKeywordRule>? rules)
         {
+            if (rules is null || rules.Count == 0)
+                return true;
+
             int count = rules.Count;
             for (int i = 0; i < count; i++)
             {

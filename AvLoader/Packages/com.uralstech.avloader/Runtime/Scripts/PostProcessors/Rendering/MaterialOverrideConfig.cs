@@ -53,8 +53,7 @@ namespace Uralstech.AvLoader.PostProcessors
             for (int i = 0; i < count; i++)
             {
                 EditorMaterialOverrideDefinition definition = _serializedMaterialOverrides[i];
-                if (!ShaderKeywordRule.IsValid(definition.KeywordRules)
-                    || definition.Deserialize() is not RuntimeMaterialOverrideDefinition runtimeDefinition
+                if (definition.Deserialize() is not RuntimeMaterialOverrideDefinition runtimeDefinition
                     || !MaterialOverrides.TryAdd(definition.ShaderMapping!.Source!, runtimeDefinition))
                     _isValid = false;
             }
