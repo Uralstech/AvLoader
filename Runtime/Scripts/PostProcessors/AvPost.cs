@@ -146,5 +146,18 @@ namespace Uralstech.AvLoader.PostProcessors
         /// </summary>
         /// <param name="config">Configuration that defines material override rules, including source shaders, target shaders, and property and keyword mappings.</param>
         public static MaterialOverridePostProcessor OverrideMaterials(MaterialOverrideConfig config) => new(config);
+
+        /// <summary>
+        /// Creates a post-processor that will ensure the loaded avatar has a component of type <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The component type.</typeparam>
+        public static ActionPostProcessor EnsureComponent<T>() where T : Component
+        {
+            return new(static (av, _) =>
+            {
+                if (!av.GameObject.TryGetComponent(out T _))
+                    av.GameObject.AddComponent<T>();
+            });
+        }
     }
 }
