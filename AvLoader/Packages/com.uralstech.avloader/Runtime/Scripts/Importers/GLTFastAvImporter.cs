@@ -61,7 +61,13 @@ namespace Uralstech.AvLoader.Importers
         /// <inheritdoc/>
         public async Awaitable<LoadedAv?> ImportAvatarAsync(AvSourceData rawData, bool throwOnFail, CancellationToken token = default)
         {
-            GltfImport import = new(DownloadProvider, DeferAgent, MaterialGenerator, Logger);
+            IDeferAgent? deferAgent = DeferAgent;
+#if UNITY_EDITOR
+            if (!UnityEditor.EditorApplication.isPlaying && deferAgent == null)
+                deferAgent = new UninterruptedDeferAgent();
+#endif
+
+            GltfImport import = new(DownloadProvider, deferAgent, MaterialGenerator, Logger);
             Uri? modelUri = !string.IsNullOrEmpty(rawData.ModelPath) ? new Uri(rawData.ModelPath) : null;
 
             bool success = await import.Load(rawData.Model, modelUri, ImportSettings, token);
