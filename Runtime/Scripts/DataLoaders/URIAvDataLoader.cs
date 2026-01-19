@@ -14,12 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
 using Uralstech.AvLoader.Utils;
@@ -138,17 +135,15 @@ namespace Uralstech.AvLoader.DataLoaders
                 if (!isSuccess)
                     return throwOnFail ? throw new AggregateException("One or more GET requests failed.", failExceptions) : null;
 
-                if (!TryDecodeMetadata(metadataDownload, _metadataEncoding, throwOnFail, out AvMetadata? metadata))
+                if (!AvMetadata.TryCreateFromBytes(metadataDownload.downloadHandler.nativeData, out AvMetadata? metadata, _metadataEncoding, throwOnFail))
                     return null;
 
-                Texture2D? fullRender = null, bustRender = null;
-                await fullRenderDownload.AwaitTextureProcessing(token);
-                if (fullRenderDownload is not null && !TryDecodeImage(fullRenderDownload, nameof(AvSourceData.FullRender), throwOnFail, out fullRender))
-                    return null;
+                Texture2D? fullRender = await fullRenderDownload.TryGetTextureAsync(throwOnFail, nameof(AvSourceData.FullRender), token);
+                Texture2D? bustRender = await bustRenderDownload.TryGetTextureAsync(throwOnFail, nameof(AvSourceData.BustRender), token);
 
-                await bustRenderDownload.AwaitTextureProcessing(token);
 #pragma warning disable IDE0046 // Convert to conditional expression
-                if (bustRenderDownload is not null && !TryDecodeImage(bustRenderDownload, nameof(AvSourceData.BustRender), throwOnFail, out bustRender))
+                if ((fullRenderDownload is not null && fullRender == null)
+                    || (bustRenderDownload is not null && bustRender == null))
                     return null;
 #pragma warning restore IDE0046 // Convert to conditional expression
 
@@ -180,47 +175,6 @@ namespace Uralstech.AvLoader.DataLoaders
                 Debug.LogWarning($"{nameof(URIAvDataLoader)}: Could not configure request due to exception from user code:\n{ex}");
                 return null;
             }
-        }
-
-        public static bool TryDecodeMetadata(UnityWebRequest metadataDownload, Encoding encoding, bool throwOnFail, [NotNullWhen(true)] out AvMetadata? result)
-        {
-            try
-            {
-                string json = encoding.GetString(metadataDownload.downloadHandler.nativeData);
-                result = JsonConvert.DeserializeObject<AvMetadata>(json);
-                return result.HasValue;
-            }
-            catch (ArgumentException ex)
-            {
-                if (throwOnFail) throw;
-                Debug.LogWarning($"{nameof(URIAvDataLoader)}: Could not load {nameof(AvMetadata)} due to argument exception:\n{ex}");
-                
-                result = null; return false;
-            }
-            catch (JsonException ex)
-            {
-                if (throwOnFail) throw;
-                Debug.LogWarning($"{nameof(URIAvDataLoader)}: Could not load {nameof(AvMetadata)} due to JSON exception:\n{ex}");
-
-                result = null; return false;
-            }
-        }
-
-        private static bool TryDecodeImage(UnityWebRequest? request, string name, bool throwOnFail, [NotNullWhen(true)] out Texture2D? result)
-        {
-            result = null;
-            if (request is null) return false;
-
-            Texture2D? tex = DownloadHandlerTexture.GetContent(request);
-            if (tex != null)
-            {
-                result = tex;
-                return true;
-            }
-            
-            if (throwOnFail) throw new InvalidDataException($"Could not load {name} as Texture2D.");
-            Debug.LogWarning($"{nameof(URIAvDataLoader)}: Could not load {name} as Texture2D.");
-            return false;
         }
     }
 }

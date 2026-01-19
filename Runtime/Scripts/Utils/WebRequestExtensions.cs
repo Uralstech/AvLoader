@@ -13,7 +13,6 @@
 // limitations under the License.
 
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -79,18 +78,6 @@ namespace Uralstech.AvLoader.Utils
             int count = current.Count;
             for (int i = 0; i < count; i++)
                 current[i].Dispose();
-        }
-
-        /// <summary>
-        /// Awaits for the <see cref="DownloadHandlerTexture"/> of the current <see cref="UnityWebRequest"/> to finish processing its texture.
-        /// </summary>
-        public static async Awaitable AwaitTextureProcessing(this UnityWebRequest? request, CancellationToken token)
-        {
-            if (request?.downloadHandler is not DownloadHandlerTexture downloadHandler || downloadHandler.isDone)
-                return;
-
-            while (!downloadHandler.isDone)
-                await Awaitable.NextFrameAsync(token);
         }
     }
 }
