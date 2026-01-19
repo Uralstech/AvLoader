@@ -202,10 +202,10 @@ namespace Uralstech.AvLoader
             AvSourceData? rawData = await LoadAvatarDataAsync(false, token);
             if (rawData is null) return null;
 
-            LoadedAv? avatar = await ImportAvatarAsync(rawData, true, token);
+            LoadedAv? avatar = await ImportAvatarAsync(rawData, false, token);
             if (avatar is null) return null;
 
-            if (!await RunPostProcessorsAndDisposeAvOnFailAsync(avatar, rawData, true, token))
+            if (!await RunPostProcessorsAndDisposeAvOnFailAsync(avatar, rawData, false, token))
                 return null;
 
             avatar.GameObject.SetActive(true);
