@@ -28,6 +28,9 @@ namespace Uralstech.AvLoader.Importers
     /// </summary>
     public class UniVRM10AvImporter : IAvImporter
     {
+        /// <summary>Update type of the loaded avatar.</summary>
+        public Vrm10Instance.UpdateTypes UpdateType = Vrm10Instance.UpdateTypes.LateUpdate;
+
         /// <summary>
         /// If <see langword="true"/>, VRM-0.x models are converted to VRM-1.0 and loaded.
         /// The components attached to the VRM-0.x model are different. (default: <see langword="true"/>)
@@ -73,6 +76,7 @@ namespace Uralstech.AvLoader.Importers
                     springboneRuntime: SpringboneRuntime
                 );
 
+                instance.UpdateType = UpdateType;
                 instance.gameObject.SetActive(false);
                 return new LoadedUniVRM10Av(instance.gameObject, instance, rawData.Metadata, rawData.FullRender, rawData.BustRender, typeof(UniVRM10AvImporter));
             }
