@@ -154,5 +154,6 @@ Always dispose loaded avatars:
 avatar.Dispose();  // Destroys GameObject, renders, post-processor created materials, etc.
 ```
 
-For full API docs, please see the [reference manual](~/api/Uralstech.AvLoader.html).
+For full API docs, please see <https://uralstech.github.io/AvLoader/api/Uralstech.AvLoader.html> or `APIReferenceManual.pdf` in the package documentation for the reference manual.
+
 You can implement `IAvDataLoader` or `IAvImporter` for custom sources/importers (e.g., cloud APIs, FBX import).
