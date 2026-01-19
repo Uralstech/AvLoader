@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using UnityEngine;
 using UnityEngine.Networking;
+using Uralstech.AvLoader.Utils;
 
 #nullable enable
 namespace Uralstech.AvLoader
@@ -73,8 +74,9 @@ namespace Uralstech.AvLoader
         /// <param name="data">The data to read from.</param>
         /// <param name="metadata">The decoded struct, <see langword="null"/> if decoding fails.</param>
         /// <param name="encoding">The encoding of the data. Assumes <see cref="Encoding.UTF8"/> if <see langword="null"/>.</param>
+        /// <param name="throwOnFail">Should the method throw if it couldn't create the <see cref="AvMetadata"/>?</param>
         /// <returns><see langword="true"/> if successful; <see langword="false"/> otherwise.</returns>
-        public static bool TryCreateFromBytes(ReadOnlySpan<byte> data, [NotNullWhen(true)] out AvMetadata? metadata, Encoding? encoding = null)
+        public static bool TryCreateFromBytes(ReadOnlySpan<byte> data, [NotNullWhen(true)] out AvMetadata? metadata, Encoding? encoding = null, bool throwOnFail = false)
         {
             metadata = null;
             encoding ??= Encoding.UTF8;
@@ -86,8 +88,12 @@ namespace Uralstech.AvLoader
 
                 return metadata.HasValue;
             }
-            catch (ArgumentException) { return false; }
-            catch (JsonException) { return false; }
+            catch (Exception ex)
+            {
+                if (throwOnFail) throw;
+                Debug.LogWarning($"{nameof(AvMetadata)}: Could not create metadata from bytes:\n{ex}");
+                return false;
+            }
         }
 
         /// <summary>
@@ -95,8 +101,9 @@ namespace Uralstech.AvLoader
         /// </summary>
         /// <param name="path">The path to read from.</param>
         /// <param name="metadata">The decoded struct, <see langword="null"/> if decoding fails.</param>
+        /// <param name="throwOnFail">Should the method throw if it couldn't create the <see cref="AvMetadata"/>?</param>
         /// <returns><see langword="true"/> if successful; <see langword="false"/> otherwise.</returns>
-        public static bool TryCreateFromFile(string path, [NotNullWhen(true)] out AvMetadata? metadata)
+        public static bool TryCreateFromFile(string path, [NotNullWhen(true)] out AvMetadata? metadata, bool throwOnFail = false)
         {
             metadata = null;
             
@@ -107,9 +114,12 @@ namespace Uralstech.AvLoader
 
                 return metadata.HasValue;
             }
-            catch (ArgumentException) { return false; }
-            catch (SystemException) { return false; }
-            catch (JsonException) { return false; }
+            catch (Exception ex)
+            {
+                if (throwOnFail) throw;
+                Debug.LogWarning($"{nameof(AvMetadata)}: Could not create metadata from file:\n{ex}");
+                return false;
+            }
         }
 
         /// <summary>
@@ -117,9 +127,9 @@ namespace Uralstech.AvLoader
         /// </summary>
         /// <param name="uri">The URI to load from.</param>
         /// <param name="encoding">The encoding of the data. Assumes <see cref="Encoding.UTF8"/> if <see langword="null"/>.</param>
-        /// <param name="logWebRequestFail">Should errors caused by the <see cref="UnityWebRequest"/> used to get the data be logged?</param>
+        /// <param name="throwOnFail">Should the method throw if it couldn't create the <see cref="AvMetadata"/>?</param>
         /// <returns>The decoded <see cref="AvMetadata"/> struct if successfull; <see langword="null"/> otherwise.</returns>
-        public static async Awaitable<AvMetadata?> TryCreateFromUriAsync(Uri uri, CancellationToken? token = null, Encoding? encoding = null, bool logWebRequestFail = true)
+        public static async Awaitable<AvMetadata?> TryCreateFromUriAsync(Uri uri, CancellationToken? token = null, Encoding? encoding = null, bool throwOnFail = true)
         {
             encoding ??= Encoding.UTF8;
             using UnityWebRequest request = UnityWebRequest.Get(uri);
@@ -129,7 +139,8 @@ namespace Uralstech.AvLoader
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                if (logWebRequestFail) Debug.LogError($"{nameof(AvMetadata)}: Could not load metadata from URI due to a web request error: ({request.responseCode}) {request.error}");
+                if (throwOnFail) throw new UnityWebRequestException(request);
+                Debug.LogWarning($"{nameof(AvMetadata)}: Could not load metadata from URI due to a web request error: ({request.responseCode}) {request.error}");
                 return null;
             }
 
@@ -138,8 +149,12 @@ namespace Uralstech.AvLoader
                 string text = encoding.GetString(request.downloadHandler.nativeData);
                 return JsonConvert.DeserializeObject<AvMetadata>(text);
             }
-            catch (ArgumentException) { return null; }
-            catch (JsonException) { return null; }
+            catch (Exception ex)
+            {
+                if (throwOnFail) throw;
+                Debug.LogWarning($"{nameof(AvMetadata)}: Could not create metadata from downloaded data:\n{ex}");
+                return null;
+            }
         }
     }
 }

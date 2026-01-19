@@ -131,13 +131,9 @@ namespace Uralstech.AvLoader.PostProcessors
                         EncodeToFormat(avatar.BustRender, BustRenderImageFormat, BustRenderJPEGQuality), token);
                 }
             }
-            catch (JsonException ex)
+            catch (Exception ex)
             {
-                Debug.LogError($"{nameof(CachePostProcessor)}: Could not save avatar due to JSON exception:\n'{ex}'.");
-            }
-            catch (SystemException ex)
-            {
-                Debug.LogError($"{nameof(CachePostProcessor)}: Could not save avatar due to system exception:\n'{ex}'.");
+                Debug.LogError($"{nameof(CachePostProcessor)}: Could not save avatar due to exception:\n'{ex}'.");
             }
         }
 

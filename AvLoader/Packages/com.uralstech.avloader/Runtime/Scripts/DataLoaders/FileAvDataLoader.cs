@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
-using Newtonsoft.Json;
 using UnityEngine;
 using Uralstech.AvLoader.Utils;
 
@@ -133,26 +132,25 @@ namespace Uralstech.AvLoader.DataLoaders
                     return null;
             }
 
+            if (!AvMetadata.TryCreateFromFile(_metadataFilePath, out AvMetadata? metadata, throwOnFail))
+                return null;
+
             try
             {
-                string metadataJson = await File.ReadAllTextAsync(_metadataFilePath, token);
-                if (!TryDecodeMetadata(metadataJson, throwOnFail, out AvMetadata? metadata))
-                    return null;
-
                 byte[] modelData = await File.ReadAllBytesAsync(modelFilePath, token);
                 Texture2D? fullRender = null, bustRender = null;
 
                 byte[]? fullRenderData = !string.IsNullOrEmpty(_fullRenderFilePath)
                     ? await File.ReadAllBytesAsync(fullRenderPath, token) : null;
 
-                if (fullRenderData is not null && !TryDecodeImage(fullRenderData, nameof(AvSourceData.FullRender), throwOnFail, out fullRender))
+                if (fullRenderData is not null && !fullRenderData.TryDecodeImage(out fullRender, nameof(AvSourceData.FullRender), throwOnFail))
                     return null;
 
                 byte[]? bustRenderData = !string.IsNullOrEmpty(_bustRenderFilePath)
                     ? await File.ReadAllBytesAsync(bustRenderPath, token) : null;
 
 #pragma warning disable IDE0046 // Convert to conditional expression
-                if (bustRenderData is not null && !TryDecodeImage(bustRenderData, nameof(AvSourceData.BustRender), throwOnFail, out bustRender))
+                if (bustRenderData is not null && !bustRenderData.TryDecodeImage(out bustRender, nameof(AvSourceData.BustRender), throwOnFail))
                     return null;
 #pragma warning restore IDE0046 // Convert to conditional expression
 
@@ -165,6 +163,23 @@ namespace Uralstech.AvLoader.DataLoaders
                 return null;
             }
         }
+
+        /// <summary>Searches for a supported avatar model file inside <paramref name="directory"/> using the default model file name.</summary>
+        /// <param name="directory">The directory to search in.</param>
+        /// <param name="searchFilter">The expected model file extension(s). Use <see cref="AvModelFileExtension.None"/> or grouped values to search across all supported formats.</param>
+        /// <param name="foundPath">When this method returns <see langword="true"/>, contains the full path to the found model file.</param>
+        /// <param name="foundExtension">When this method returns <see langword="true"/>, contains the detected model file extension.</param>
+        /// <returns><see langword="true"/> if a valid model file was found; otherwise, <see langword="false"/>.</returns>
+        public static bool TrySearchForModelFile(string directory, AvModelFileExtension searchFilter,
+            [NotNullWhen(true)] out string? foundPath, out AvModelFileExtension foundExtension) =>
+            TrySearchForModelFile(directory, IOUtils.DefaultModelFile, searchFilter, false, out foundPath, out foundExtension);
+
+        /// <summary>Searches for a supported avatar model file inside <paramref name="directory"/> using a custom base file name.</summary>
+        /// <param name="fileNameWithoutExtensino">The model file name without an extension.</param>
+        /// <inheritdoc cref="TrySearchForModelFile(string, AvModelFileExtension, out string?, out AvModelFileExtension)"/>
+        public static bool TrySearchForModelFile(string directory, string fileNameWithoutExtensino, AvModelFileExtension searchFilter,
+            [NotNullWhen(true)] out string? foundPath, out AvModelFileExtension foundExtension) =>
+            TrySearchForModelFile(directory, fileNameWithoutExtensino, searchFilter, false, out foundPath, out foundExtension);
 
         private static bool TrySearchForModelFile(string basePath, string fileName, AvModelFileExtension baseExt, bool throwOnFail,
             [NotNullWhen(true)] out string? resultPath, out AvModelFileExtension resultExtension)
@@ -197,6 +212,29 @@ namespace Uralstech.AvLoader.DataLoaders
             return false;
         }
 
+        /// <summary>Searches for a supported full-render image file inside <paramref name="directory"/> using the default full-render file name.</summary>
+        /// <param name="directory">The directory to search in.</param>
+        /// <param name="searchFilter">The expected image file extension(s). Use <see cref="AvImageFileExtension.None"/> or grouped values to search across all supported formats.</param>
+        /// <param name="foundPath">When this method returns <see langword="true"/>, contains the full path to the found image file.</param>
+        /// <param name="foundExtension">When this method returns <see langword="true"/>, contains the detected image file extension.</param>
+        /// <returns><see langword="true"/> if a valid image file was found; otherwise, <see langword="false"/>.</returns>
+        public static bool TrySearchForFullRender(string directory, AvImageFileExtension searchFilter,
+            [NotNullWhen(true)] out string? foundPath, out AvImageFileExtension foundExtension) =>
+            TrySearchForImageFile(directory, IOUtils.DefaultFullRenderFile, searchFilter, false, out foundPath, out foundExtension);
+
+        /// <summary>Searches for a supported bust-render image file inside <paramref name="directory"/> using the default bust-render file name.</summary>
+        /// <inheritdoc cref="TrySearchForFullRender(string, AvImageFileExtension, out string?, out AvImageFileExtension)"/>
+        public static bool TrySearchForBustRender(string directory, AvImageFileExtension searchFilter,
+            [NotNullWhen(true)] out string? foundPath, out AvImageFileExtension foundExtension) =>
+            TrySearchForImageFile(directory, IOUtils.DefaultBustRenderFile, searchFilter, false, out foundPath, out foundExtension);
+
+        /// <summary>Searches for a supported image file inside <paramref name="directory"/> using a custom base file name.</summary>
+        /// <param name="fileNameWithoutExtensino">The image file name without an extension.</param>
+        /// <inheritdoc cref="TrySearchForFullRender(string, AvImageFileExtension, out string?, out AvImageFileExtension)"/>
+        public static bool TrySearchForImageFile(string directory, string fileNameWithoutExtensino, AvImageFileExtension searchFilter,
+            [NotNullWhen(true)] out string? foundPath, out AvImageFileExtension foundExtension) =>
+            TrySearchForImageFile(directory, fileNameWithoutExtensino, searchFilter, false, out foundPath, out foundExtension);
+
         private static bool TrySearchForImageFile(string basePath, string fileName, AvImageFileExtension baseExt, bool throwOnFail,
             [NotNullWhen(true)] out string? resultPath, out AvImageFileExtension resultExtension)
         {
@@ -225,42 +263,6 @@ namespace Uralstech.AvLoader.DataLoaders
             if (throwOnFail) throw new FileNotFoundException(errorMessage);
 
             Debug.LogWarning($"{nameof(FileAvDataLoader)}: {errorMessage}");
-            return false;
-        }
-
-        private static bool TryDecodeMetadata(string json, bool throwOnFail, [NotNullWhen(true)] out AvMetadata? result)
-        {
-            try
-            {
-                result = JsonConvert.DeserializeObject<AvMetadata>(json);
-                return result.HasValue;
-            }
-            catch (JsonException ex)
-            {
-                if (throwOnFail) throw;
-                Debug.LogWarning($"{nameof(FileAvDataLoader)}: Could not load {nameof(AvMetadata)} due to JSON exception:\n{ex}");
-
-                result = null;
-                return false;
-            }
-        }
-
-        private static bool TryDecodeImage(byte[]? data, string name, bool throwOnFail, [NotNullWhen(true)] out Texture2D? result)
-        {
-            result = null;
-            if (data is null) return false;
-
-            Texture2D tex = new(2,2) { name = name };
-            if (tex.LoadImage(data))
-            {
-                result = tex;
-                return true;
-            }
-            
-            if (throwOnFail) throw new InvalidDataException($"Could not load {name} as Texture2D.");
-            Debug.LogWarning($"{nameof(FileAvDataLoader)}: Could not load {name} as Texture2D.");
-            
-            UnityEngine.Object.Destroy(tex);
             return false;
         }
     }
