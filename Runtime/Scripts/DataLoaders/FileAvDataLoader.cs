@@ -154,7 +154,7 @@ namespace Uralstech.AvLoader.DataLoaders
                     return null;
 #pragma warning restore IDE0046 // Convert to conditional expression
 
-                return new AvSourceData(modelData, modelFormat, modelFilePath, metadata.Value, typeof(FileAvDataLoader), fullRender, bustRender);
+                return new AvSourceData(modelData, modelFormat, modelFilePath, metadata, typeof(FileAvDataLoader), fullRender, bustRender);
             }
             catch (SystemException ex)
             {

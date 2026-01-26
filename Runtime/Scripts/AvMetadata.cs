@@ -13,12 +13,14 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using UnityEngine;
 using UnityEngine.Networking;
 using Uralstech.AvLoader.Utils;
@@ -29,8 +31,8 @@ namespace Uralstech.AvLoader
     /// <summary>
     /// Information regarding a loaded model.
     /// </summary>
-    [JsonObject]
-    public struct AvMetadata
+    [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
+    public class AvMetadata
     {
         /// <summary>
         /// Unique ID of the avatar.
@@ -69,6 +71,16 @@ namespace Uralstech.AvLoader
         public string? SkinTone;
 
         /// <summary>
+        /// Optional additional metadata for the avatar.
+        /// </summary>
+        public Dictionary<string, string>? AdditionalMetadata;
+
+        public AvMetadata(string id)
+        {
+            Id = id;
+        }
+
+        /// <summary>
         /// Tries creating a <see cref="AvMetadata"/> struct from raw bytes.
         /// </summary>
         /// <param name="data">The data to read from.</param>
@@ -86,7 +98,7 @@ namespace Uralstech.AvLoader
                 string text = encoding.GetString(data);
                 metadata = JsonConvert.DeserializeObject<AvMetadata>(text);
 
-                return metadata.HasValue;
+                return metadata is not null;
             }
             catch (Exception ex)
             {
@@ -112,7 +124,7 @@ namespace Uralstech.AvLoader
                 string text = File.ReadAllText(path);
                 metadata = JsonConvert.DeserializeObject<AvMetadata>(text);
 
-                return metadata.HasValue;
+                return metadata is not null;
             }
             catch (Exception ex)
             {
@@ -129,7 +141,7 @@ namespace Uralstech.AvLoader
         /// <param name="encoding">The encoding of the data. Assumes <see cref="Encoding.UTF8"/> if <see langword="null"/>.</param>
         /// <param name="throwOnFail">Should the method throw if it couldn't create the <see cref="AvMetadata"/>?</param>
         /// <returns>The decoded <see cref="AvMetadata"/> struct if successfull; <see langword="null"/> otherwise.</returns>
-        public static async Awaitable<AvMetadata?> TryCreateFromUriAsync(Uri uri, CancellationToken? token = null, Encoding? encoding = null, bool throwOnFail = true)
+        public static async Awaitable<AvMetadata?> TryCreateFromUriAsync(Uri uri, CancellationToken? token = null, Encoding? encoding = null, bool throwOnFail = false)
         {
             encoding ??= Encoding.UTF8;
             using UnityWebRequest request = UnityWebRequest.Get(uri);
