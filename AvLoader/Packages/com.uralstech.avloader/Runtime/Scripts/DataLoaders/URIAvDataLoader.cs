@@ -149,7 +149,7 @@ namespace Uralstech.AvLoader.DataLoaders
 
                 return new AvSourceData(
                     modelDownload.downloadHandler.data, _modelFormat, _modelURI.AbsoluteUri,
-                    metadata.Value, typeof(URIAvDataLoader), fullRender, bustRender
+                    metadata, typeof(URIAvDataLoader), fullRender, bustRender
                 );
             }
             finally
