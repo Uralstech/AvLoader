@@ -3,7 +3,7 @@
   "displayName": "AvLoader",
   "description": "Unity framework for loading 3D avatars of different formats and sources at runtime, currently supports glTF and VRM.",
   "keywords": [],
-  "version": "1.0.0-preview.4",
+  "version": "1.0.0",
   "unity": "6000.0",
   "hideInEditor": false,
   "documentationUrl": "https://uralstech.github.io/AvLoader/",
