@@ -96,7 +96,7 @@ namespace Uralstech.AvLoader.PostProcessors.Rendering
         internal IReadOnlyList<ShaderKeywordMapping>? _keywordMappings;
         internal IReadOnlyList<ShaderKeywordRule>? _keywordRules;
 
-#pragma warning disable CS8618
+#pragma warning disable CS8618 // Validation-free constructor for internal deserialization methods.
         internal RuntimeMaterialOverrideDefinition() { }
 #pragma warning restore CS8618
 

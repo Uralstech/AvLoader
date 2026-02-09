@@ -142,6 +142,7 @@ namespace Uralstech.AvLoader.Importers
         /// <inheritdoc/>
         public override IReadOnlyList<Material>? TryGetAvatarMaterials()
         {
+            ThrowIfDisposed();
             int count = Import.MaterialCount;
             Material[] materials = new Material[count];
             
@@ -154,6 +155,7 @@ namespace Uralstech.AvLoader.Importers
         /// <inheritdoc/>
         public override IReadOnlyList<Mesh>? TryGetAvatarMeshes()
         {
+            ThrowIfDisposed();
             int count = Import.Meshes.Count;
             Mesh[] meshes = new Mesh[count];
 

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using UnityEngine;
 
 #nullable enable
@@ -34,10 +33,7 @@ namespace Uralstech.AvLoader.PostProcessors
         /// <inheritdoc/>
         public void PostProcess(LoadedAv avatar, AvSourceData _)
         {
-            IEnumerable<Material>? materials = avatar.TryGetAvatarMaterials();
-            materials ??= GetMaterialsFromRenderers(avatar);
-
-            foreach (Material? material in materials)
+            foreach (Material? material in avatar.GetAvatarMaterials())
             {
                 if (material == null) continue;
 
@@ -45,22 +41,6 @@ namespace Uralstech.AvLoader.PostProcessors
                     material.shader = swap;
                 else if (Configuration.FallbackShader != null && material.shader != Configuration.FallbackShader)
                     material.shader = Configuration.FallbackShader;
-            }
-        }
-
-        private static IEnumerable<Material> GetMaterialsFromRenderers(LoadedAv avatar)
-        {
-            if (avatar.TryGetAvatarRenderers() is not IReadOnlyList<Renderer> renderers)
-                renderers = avatar.GameObject.GetComponentsInChildren<Renderer>();
-
-            HashSet<Material> materialsSet = new();
-            foreach (Renderer renderer in renderers)
-            {
-                foreach (Material material in renderer.sharedMaterials)
-                {
-                    if (materialsSet.Add(material))
-                        yield return material;
-                }
             }
         }
     }

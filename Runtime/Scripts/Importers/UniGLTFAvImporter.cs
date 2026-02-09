@@ -85,13 +85,25 @@ namespace Uralstech.AvLoader.Importers
         }
 
         /// <inheritdoc/>
-        public override IReadOnlyList<Material>? TryGetAvatarMaterials() => GLTFInstance.Materials;
+        public override IReadOnlyList<Material>? TryGetAvatarMaterials()
+        {
+            ThrowIfDisposed();
+            return GLTFInstance.Materials;
+        }
 
         /// <inheritdoc/>
-        public override IReadOnlyList<Mesh>? TryGetAvatarMeshes() => GLTFInstance.Meshes;
+        public override IReadOnlyList<Mesh>? TryGetAvatarMeshes()
+        {
+            ThrowIfDisposed();
+            return GLTFInstance.Meshes;
+        }
 
         /// <inheritdoc/>
-        public override IReadOnlyList<Renderer>? TryGetAvatarRenderers() => GLTFInstance.Renderers;
+        public override IReadOnlyList<Renderer>? TryGetAvatarRenderers()
+        {
+            ThrowIfDisposed();
+            return GLTFInstance.Renderers;
+        }
 
         protected override void ImporterSpecificDispose() => GLTFInstance.Dispose();
     }
