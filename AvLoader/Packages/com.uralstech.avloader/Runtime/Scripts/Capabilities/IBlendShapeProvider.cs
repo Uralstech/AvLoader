@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -47,6 +48,30 @@ namespace Uralstech.AvLoader.Capabilities
 
         /// <summary>Checks if a weight channel with the given name exists.</summary>
         public bool HasWeight(string name);
+    }
+
+    /// <summary>Provides allocation-free bulk access to blendshape channels.</summary>
+    /// <remarks>
+    /// The semantic meaning of channels (e.g. expressions vs mesh blendshapes)
+    /// is implementation-defined and should be determined via additional
+    /// capability interfaces such as <see cref="IAvatarExpressionProvider"/>
+    /// or <see cref="IMeshBlendShapeProvider"/>.
+    /// </remarks>
+    public interface IBlendShapeProviderBulk : IBlendShapeProvider
+    {
+        /// <summary>Retrieves the weights of the specified blendshape channels into the provided buffer.</summary>
+        /// <remarks>For channel names that do not exist, the corresponding output value is set to zero.</remarks>
+        public void GetWeights(ReadOnlySpan<string> names, Span<float> weights);
+
+        /// <summary>Sets the weights of the specified blendshape channels.</summary>
+        /// <remarks>Channel names that do not exist are ignored; the return value indicates how many weights were applied.</remarks>
+        /// <returns>The number of weights successfully applied.</returns>
+        public int SetWeights(ReadOnlySpan<string> names, ReadOnlySpan<float> weights);
+
+        /// <summary>Sets multiple blendshape weights using name–value pairs.</summary>
+        /// <remarks>Channel names that do not exist are ignored; the return value indicates how many weights were applied.</remarks>
+        /// <returns>The number of weights successfully applied.</returns>
+        public int SetWeights(ReadOnlySpan<(string name, float weight)> values);
     }
 
     /// <summary>
@@ -89,6 +114,99 @@ namespace Uralstech.AvLoader.Capabilities
 
             foundName = null;
             return false;
+        }
+
+        /// <summary>Retrieves multiple blendshape weights into the provided buffer.</summary>
+        /// <remarks>
+        /// Uses bulk access when available; otherwise falls back to per-channel access.
+        /// Missing channel names result in zero values.
+        /// </remarks>
+        public static void GetWeights(this IBlendShapeProvider provider, ReadOnlySpan<string> names, Span<float> weights)
+        {
+            if (provider is IBlendShapeProviderBulk bulk)
+            {
+                bulk.GetWeights(names, weights);
+                return;
+            }
+
+            if (weights.Length < names.Length)
+                throw new ArgumentException($"{nameof(weights)} must be at least the same size as {nameof(names)}.", nameof(weights));
+
+            for (int i = 0; i < names.Length; i++)
+            {
+                string name = names[i];
+                weights[i] = provider.HasWeight(name) ? provider.GetWeight(name) : 0f;
+            }
+        }
+
+        /// <summary>Sets multiple blendshape weights.</summary>
+        /// <remarks>
+        /// Uses bulk access when available; otherwise falls back to per-channel access.
+        /// Missing channel names are ignored.
+        /// </remarks>
+        /// <returns>The number of weights successfully applied.</returns>
+        public static int SetWeights(this IBlendShapeProvider provider, ReadOnlySpan<string> names, ReadOnlySpan<float> weights)
+        {
+            if (provider is IBlendShapeProviderBulk bulk)
+                return bulk.SetWeights(names, weights);
+
+            if (weights.Length < names.Length)
+                throw new ArgumentException($"{nameof(weights)} must be at least the same size as {nameof(names)}.", nameof(weights));
+
+            int set = 0;
+            for (int i = 0; i < names.Length; i++)
+            {
+                string name = names[i];
+                if (!provider.HasWeight(name))
+                    continue;
+
+                provider.SetWeight(name, weights[i]);
+                set++;
+            }
+
+            return set;
+        }
+
+        /// <summary>Sets multiple blendshape weights using name–value pairs.</summary>
+        /// <remarks>
+        /// Uses bulk access when available; otherwise falls back to per-channel access.
+        /// Missing channel names are ignored.
+        /// </remarks>
+        /// <returns>The number of weights successfully applied.</returns>
+        public static int SetWeights(this IBlendShapeProvider provider, ReadOnlySpan<(string name, float weight)> values)
+        {
+            if (provider is IBlendShapeProviderBulk bulk)
+                return bulk.SetWeights(values);
+
+            int set = 0;
+            for (int i = 0; i < values.Length; i++)
+            {
+                (string name, float weight) = values[i];
+                if (!provider.HasWeight(name))
+                    continue;
+
+                provider.SetWeight(name, weight);
+                set++;
+            }
+
+            return set;
+        }
+
+        /// <summary>Sets multiple blendshape weights from a dictionary.</summary>
+        /// <remarks>This is a convenience overload; missing channel names are ignored.</remarks>
+        public static int SetWeights(this IBlendShapeProvider provider, IReadOnlyDictionary<string, float> values)
+        {
+            int set = 0;
+            foreach (KeyValuePair<string, float> pair in values)
+            {
+                if (!provider.HasWeight(pair.Key))
+                    continue;
+
+                provider.SetWeight(pair.Key, pair.Value);
+                set++;
+            }
+
+            return set;
         }
     }
 }
