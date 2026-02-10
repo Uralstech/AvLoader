@@ -28,10 +28,21 @@ namespace Uralstech.AvLoader.Capabilities
         /// <summary>Case-sensitive keys for all available blend weights.</summary>
         public IReadOnlyCollection<string> ChannelNames { get; }
 
+        /// <summary>Does this avatar have any blendshape weights?</summary>
+        public bool HasWeights { get; }
+
         /// <summary>Gets the weight for the given name.</summary>
+        /// <remarks>
+        /// If multiple blend shape sources in the avatar have the same
+        /// channel name, this gets the maximum weight.
+        /// </remarks>
         public float GetWeight(string name);
 
         /// <summary>Sets the weight for the given name.</summary>
+        /// <remarks>
+        /// If multiple blend shape sources in the avatar have the same
+        /// channel name, this sets the weight for all of them.
+        /// </remarks>
         public void SetWeight(string name, float weight);
 
         /// <summary>Checks if a weight channel with the given name exists.</summary>

@@ -14,7 +14,6 @@
 
 #if UNIGLTF_INSTALLED
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using UniGLTF;
 using UnityEngine;
@@ -68,44 +67,6 @@ namespace Uralstech.AvLoader.Importers
                 return null;
             }
         }
-    }
-
-    /// <summary>
-    /// A loaded UniGLTF glTF avatar.
-    /// </summary>
-    public class LoadedUniGLTFAv : LoadedAv
-    {
-        /// <summary>The glTF avatar.</summary>
-        public readonly RuntimeGltfInstance GLTFInstance;
-
-        public LoadedUniGLTFAv(GameObject gameObject, RuntimeGltfInstance gltfInstance, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
-            : base(gameObject, metadata, fullRender, bustRender, importerType)
-        {
-            GLTFInstance = gltfInstance;
-        }
-
-        /// <inheritdoc/>
-        public override IReadOnlyList<Material>? TryGetAvatarMaterials()
-        {
-            ThrowIfDisposed();
-            return GLTFInstance.Materials;
-        }
-
-        /// <inheritdoc/>
-        public override IReadOnlyList<Mesh>? TryGetAvatarMeshes()
-        {
-            ThrowIfDisposed();
-            return GLTFInstance.Meshes;
-        }
-
-        /// <inheritdoc/>
-        public override IReadOnlyList<Renderer>? TryGetAvatarRenderers()
-        {
-            ThrowIfDisposed();
-            return GLTFInstance.Renderers;
-        }
-
-        protected override void ImporterSpecificDispose() => GLTFInstance.Dispose();
     }
 }
 #endif

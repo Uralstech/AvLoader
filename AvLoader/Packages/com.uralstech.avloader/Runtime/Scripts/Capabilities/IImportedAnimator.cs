@@ -27,7 +27,7 @@ namespace Uralstech.AvLoader.Capabilities
     /// Animators added later by post-processors or user code are not considered part of this
     /// capability and should be accessed directly from <see cref="LoadedAv.GameObject"/>.
     /// </remarks>
-    public interface IImporterGeneratedAnimatorProvider : ICapability
+    public interface IImportedAnimator : ICapability
     {
         /// <summary>The importer-generated animator.</summary>
         public Animator Animator { get; }

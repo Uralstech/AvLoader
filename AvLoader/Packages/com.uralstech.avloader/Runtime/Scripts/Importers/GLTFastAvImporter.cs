@@ -14,7 +14,6 @@
 
 #if GLTFAST_INSTALLED
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using GLTFast;
@@ -122,54 +121,6 @@ namespace Uralstech.AvLoader.Importers
                 Debug.LogWarning($"{nameof(GLTFastAvImporter)}: Could not create instantiator due to exception from user code:\n{ex}");
                 return null;
             }
-        }
-    }
-
-    /// <summary>
-    /// A loaded glTFast glTF avatar.
-    /// </summary>
-    public class LoadedGLTFastAv : LoadedAv
-    {
-        /// <summary>The glTFast import associated with the avatar.</summary>
-        public readonly GltfImport Import;
-
-        public LoadedGLTFastAv(GameObject gameObject, GltfImport import, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
-            : base(gameObject, metadata, fullRender, bustRender, importerType)
-        {
-            Import = import;
-        }
-
-        /// <inheritdoc/>
-        public override IReadOnlyList<Material>? TryGetAvatarMaterials()
-        {
-            ThrowIfDisposed();
-            int count = Import.MaterialCount;
-            Material[] materials = new Material[count];
-            
-            for (int i = 0; i < count; i++)
-                materials[i] = Import.GetMaterial(i);
-
-            return materials;
-        }
-
-        /// <inheritdoc/>
-        public override IReadOnlyList<Mesh>? TryGetAvatarMeshes()
-        {
-            ThrowIfDisposed();
-            int count = Import.Meshes.Count;
-            Mesh[] meshes = new Mesh[count];
-
-            using IEnumerator<Mesh> meshEnumerator = Import.Meshes.GetEnumerator();
-            for (int i = 0; i < count && meshEnumerator.MoveNext(); i++)
-                meshes[i] = meshEnumerator.Current;
-            
-            return meshes;
-        }
-
-        protected override void ImporterSpecificDispose()
-        {
-            UnityEngine.Object.Destroy(GameObject);
-            Import.Dispose();
         }
     }
 }
