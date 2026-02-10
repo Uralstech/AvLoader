@@ -26,7 +26,7 @@ namespace Uralstech.AvLoader.Importers
     /// <summary>
     /// A loaded UniVRM VRM10 avatar.
     /// </summary>
-    public class LoadedUniVRM10Av : LoadedAv, IImportedAnimator, IAvatarExpressionProvider
+    public class LoadedUniVRM10Av : LoadedAv, IImportedAnimator, IAvatarExpressionProvider, IBlendShapeProviderBulk
     {
         /// <summary>The VRM avatar.</summary>
         public readonly Vrm10Instance VRMInstance;
@@ -100,12 +100,68 @@ namespace Uralstech.AvLoader.Importers
     
             VRMInstance.Runtime.Expression.SetWeight(key, weight);
         }
-
+        
         /// <inheritdoc/>
         public bool HasWeight(string name)
         {
             ThrowIfDisposed();
             return _expressionKeys.ContainsKey(name);
+        }
+
+        /// <inheritdoc/>
+        public void GetWeights(ReadOnlySpan<string> names, Span<float> weights)
+        {
+            ThrowIfDisposed();
+            if (weights.Length < names.Length)
+                throw new ArgumentException($"{nameof(weights)} must be at least the same size as {nameof(names)}.", nameof(weights));
+
+            int count = names.Length;
+            for (int i = 0; i < count; i++)
+            {
+                weights[i] = _expressionKeys.TryGetValue(names[i], out ExpressionKey key)
+                    ? VRMInstance.Runtime.Expression.GetWeight(key) : 0f;
+            }
+        }
+
+        /// <inheritdoc/>
+        public int SetWeights(ReadOnlySpan<string> names, ReadOnlySpan<float> weights)
+        {
+            ThrowIfDisposed();
+            if (weights.Length < names.Length)
+                throw new ArgumentException($"{nameof(weights)} must be at least the same size as {nameof(names)}.", nameof(weights));
+
+            int set = 0;
+            int count = names.Length;
+            for (int i = 0; i < count; i++)
+            {
+                if (!_expressionKeys.TryGetValue(names[i], out ExpressionKey key))
+                    continue;
+
+                VRMInstance.Runtime.Expression.SetWeight(key, weights[i]);
+                set++;
+            }
+
+            return set;
+        }
+
+        /// <inheritdoc/>
+        public int SetWeights(ReadOnlySpan<(string name, float weight)> values)
+        {
+            ThrowIfDisposed();
+
+            int set = 0;
+            int count = values.Length;
+            for (int i = 0; i < count; i++)
+            {
+                (string name, float weight) = values[i];
+                if (!_expressionKeys.TryGetValue(name, out ExpressionKey key))
+                    continue;
+                
+                VRMInstance.Runtime.Expression.SetWeight(key, weight);
+                set++;
+            }
+
+            return set;
         }
 
         protected override void ImporterSpecificDispose()
