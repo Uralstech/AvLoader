@@ -19,6 +19,7 @@ using System.Threading;
 using UniGLTF;
 using UnityEngine;
 using UniVRM10;
+using Uralstech.AvLoader.Capabilities;
 
 #nullable enable
 namespace Uralstech.AvLoader.Importers
@@ -92,7 +93,7 @@ namespace Uralstech.AvLoader.Importers
     /// <summary>
     /// A loaded UniVRM VRM10 avatar.
     /// </summary>
-    public class LoadedUniVRM10Av : LoadedAv
+    public class LoadedUniVRM10Av : LoadedAv, IImporterGeneratedAnimatorProvider, IAvatarExpressionProvider
     {
         /// <summary>The VRM avatar.</summary>
         public readonly Vrm10Instance VRMInstance;
@@ -100,11 +101,27 @@ namespace Uralstech.AvLoader.Importers
         /// <summary>The <see cref="RuntimeGltfInstance"/> component of the VRM avatar, if it exists.</summary>
         public readonly RuntimeGltfInstance? GLTFInstance;
 
+        /// <inheritdoc/>
+        public Animator Animator { get; }
+
+        /// <inheritdoc/>
+        public IReadOnlyCollection<string> ChannelNames => _expressionKeys.Keys;
+        private readonly Dictionary<string, ExpressionKey> _expressionKeys;
+
         public LoadedUniVRM10Av(GameObject gameObject, Vrm10Instance vrmInstance, AvMetadata metadata, Texture2D? fullRender, Texture2D? bustRender, Type importerType)
             : base(gameObject, metadata, fullRender, bustRender, importerType)
         {
             VRMInstance = vrmInstance;
             vrmInstance.TryGetComponent(out GLTFInstance);
+
+            Animator? controlRigAnim = vrmInstance.Runtime.ControlRig?.ControlRigAnimator;
+            Animator = controlRigAnim != null ? controlRigAnim : VRMInstance.GetComponent<Animator>();
+
+            IReadOnlyList<ExpressionKey> expressionKeys = VRMInstance.Runtime.Expression.ExpressionKeys;
+            _expressionKeys = new Dictionary<string, ExpressionKey>(expressionKeys.Count);
+
+            foreach (ExpressionKey key in expressionKeys)
+                _expressionKeys.Add(key.Name, key);
         }
 
         /// <inheritdoc/>
@@ -126,6 +143,27 @@ namespace Uralstech.AvLoader.Importers
         {
             ThrowIfDisposed();
             return GLTFInstance != null ? GLTFInstance.Renderers : null;
+        }
+
+        /// <inheritdoc/>
+        public float GetWeight(string name)
+        {
+            ThrowIfDisposed();
+            return VRMInstance.Runtime.Expression.GetWeight(_expressionKeys[name]);
+        }
+
+        /// <inheritdoc/>
+        public void SetWeight(string name, float weight)
+        {
+            ThrowIfDisposed();
+            VRMInstance.Runtime.Expression.SetWeight(_expressionKeys[name], weight);
+        }
+
+        /// <inheritdoc/>
+        public bool HasWeight(string name)
+        {
+            ThrowIfDisposed();
+            return _expressionKeys.ContainsKey(name);
         }
 
         protected override void ImporterSpecificDispose()
