@@ -106,6 +106,38 @@ namespace Uralstech.AvLoader
             }
         }
 
+        /// <summary>Tries to cast the current avatar object to <typeparamref name="T"/>.</summary>
+        /// <remarks>
+        /// Ultimately, this is just syntactic sugar for:
+        /// <code>
+        /// if (avatar is T capability)
+        ///     ...
+        /// else
+        ///     ...
+        /// </code>
+        /// </remarks>
+        /// <typeparam name="T">The capability type to cast to.</typeparam>
+        /// <param name="capability">The casted result, or <see langword="null"/> if casting failed.</param>
+        /// <returns><see langword="true"/> if casted successfully; <see langword="false"/> otherwise.</returns>
+        public bool TryGetCapability<T>([System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out T? capability)
+            where T : Capabilities.ICapability
+        {
+            ThrowIfDisposed();
+            capability = this is T casted ? casted : default;
+            return capability is not null;
+        }
+
+        /// <summary>Casts the current avatar object to <typeparamref name="T"/>.</summary>
+        /// <typeparam name="T">The capability type to cast to.</typeparam>
+        /// <returns>The casted result.</returns>
+        public T GetCapability<T>() where T : Capabilities.ICapability
+        {
+            ThrowIfDisposed();
+            return this is not T casted
+                ? throw new InvalidOperationException($"Avatar does not support capability {typeof(T).Name}")
+                : casted;
+        }
+
         private IReadOnlyList<Material>? _materialsCache;
 
         /// <summary>Gets all materials used by the avatar.</summary>
