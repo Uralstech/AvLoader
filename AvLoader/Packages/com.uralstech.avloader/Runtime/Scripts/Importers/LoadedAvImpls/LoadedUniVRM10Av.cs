@@ -26,7 +26,7 @@ namespace Uralstech.AvLoader.Importers
     /// <summary>
     /// A loaded UniVRM VRM10 avatar.
     /// </summary>
-    public class LoadedUniVRM10Av : LoadedAv, IImportedAnimator, IAvatarExpressionProvider, IBlendShapeProviderBulk
+    public class LoadedUniVRM10Av : LoadedAv, IImportedAnimator, ILookAtProvider, IAvatarExpressionProvider, IBlendShapeProviderBulk
     {
         /// <summary>The VRM avatar.</summary>
         public readonly Vrm10Instance VRMInstance;
@@ -80,6 +80,30 @@ namespace Uralstech.AvLoader.Importers
         {
             ThrowIfDisposed();
             return GLTFInstance != null ? GLTFInstance.Renderers : null;
+        }
+
+        /// <inheritdoc/>
+        public void SetTarget(Transform transform)
+        {
+            ThrowIfDisposed();
+            VRMInstance.LookAtTarget = transform;
+            VRMInstance.LookAtTargetType = VRM10ObjectLookAt.LookAtTargetTypes.SpecifiedTransform;
+        }
+
+        /// <inheritdoc/>
+        public void SetTarget(Vector3 worldPosition)
+        {
+            ThrowIfDisposed();
+            VRMInstance.Runtime.LookAt.LookAtInput = new LookAtInput() { WorldPosition = worldPosition };
+            VRMInstance.LookAtTargetType = VRM10ObjectLookAt.LookAtTargetTypes.YawPitchValue;
+        }
+
+        /// <inheritdoc/>
+        public void ClearTarget()
+        {
+            ThrowIfDisposed();
+            VRMInstance.Runtime.LookAt.LookAtInput = new LookAtInput() { YawPitch = new LookAtEyeDirection(0f, 0f)};
+            VRMInstance.LookAtTargetType = VRM10ObjectLookAt.LookAtTargetTypes.YawPitchValue;
         }
 
         /// <inheritdoc/>
