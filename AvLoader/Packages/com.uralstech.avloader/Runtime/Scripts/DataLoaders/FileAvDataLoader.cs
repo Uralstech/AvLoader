@@ -149,10 +149,10 @@ namespace Uralstech.AvLoader.DataLoaders
                 byte[]? bustRenderData = !string.IsNullOrEmpty(_bustRenderFilePath)
                     ? await File.ReadAllBytesAsync(bustRenderPath, token) : null;
 
-#pragma warning disable IDE0046 // Convert to conditional expression
+#pragma warning disable IDE0046 // Long conditions reduce readability of conditional expressions.
                 if (bustRenderData is not null && !bustRenderData.TryDecodeImage(out bustRender, nameof(AvSourceData.BustRender), throwOnFail))
                     return null;
-#pragma warning restore IDE0046 // Convert to conditional expression
+#pragma warning restore IDE0046
 
                 return new AvSourceData(modelData, modelFormat, modelFilePath, metadata, typeof(FileAvDataLoader), fullRender, bustRender);
             }

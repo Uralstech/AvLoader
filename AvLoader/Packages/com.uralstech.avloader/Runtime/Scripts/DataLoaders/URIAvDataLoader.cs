@@ -141,11 +141,11 @@ namespace Uralstech.AvLoader.DataLoaders
                 Texture2D? fullRender = await fullRenderDownload.TryGetTextureAsync(throwOnFail, nameof(AvSourceData.FullRender), token);
                 Texture2D? bustRender = await bustRenderDownload.TryGetTextureAsync(throwOnFail, nameof(AvSourceData.BustRender), token);
 
-#pragma warning disable IDE0046 // Convert to conditional expression
+#pragma warning disable IDE0046 // Long conditions reduce readability of conditional expressions.
                 if ((fullRenderDownload is not null && fullRender == null)
                     || (bustRenderDownload is not null && bustRender == null))
                     return null;
-#pragma warning restore IDE0046 // Convert to conditional expression
+#pragma warning restore IDE0046
 
                 return new AvSourceData(
                     modelDownload.downloadHandler.data, _modelFormat, _modelURI.AbsoluteUri,

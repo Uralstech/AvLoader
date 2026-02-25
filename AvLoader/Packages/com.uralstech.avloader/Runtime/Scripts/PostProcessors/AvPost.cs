@@ -159,5 +159,33 @@ namespace Uralstech.AvLoader.PostProcessors
                     av.GameObject.AddComponent<T>();
             });
         }
+
+        /// <summary>
+        /// Creates a post-processor that ensures the avatar has a component of type <typeparamref name="T"/>
+        /// and attaches it as dependent on the loaded avatar.
+        /// </summary>
+        /// <typeparam name="T">The dependent component type.</typeparam>
+        public static ActionPostProcessor EnsureDependentComponent<T>() where T : Component, IAvatarDependentComponent
+        {
+            return new (static (av, _) =>
+            {
+                if (!av.GameObject.TryGetComponent(out T component))
+                    component = av.GameObject.AddComponent<T>();
+                
+                component.OnAvatarAttached(av);
+            });
+        }
+    }
+
+    /// <summary>
+    /// Marks a <see cref="Component"/> as semantically dependent on a <see cref="LoadedAv"/> instance.
+    /// </summary>
+    public interface IAvatarDependentComponent
+    {
+        /// <summary>
+        /// Called when the component is attached to an avatar via a dependent-component post-processor.
+        /// </summary>
+        /// <param name="avatar">The loaded avatar this component depends on.</param>
+        public void OnAvatarAttached(LoadedAv avatar);
     }
 }

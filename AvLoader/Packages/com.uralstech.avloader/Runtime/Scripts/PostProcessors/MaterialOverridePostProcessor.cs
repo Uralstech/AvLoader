@@ -37,10 +37,7 @@ namespace Uralstech.AvLoader.PostProcessors
         /// <inheritdoc/>
         public void PostProcess(LoadedAv avatar, AvSourceData rawData)
         {
-            IEnumerable<Renderer>? renderers = avatar.TryGetAvatarRenderers();
-            renderers ??= avatar.GameObject.GetComponentsInChildren<Renderer>();
-
-            foreach (Renderer renderer in renderers)
+            foreach (Renderer renderer in avatar.GetAvatarRenderers())
             {
                 Material[] materials = renderer.sharedMaterials;
                 int count = materials.Length;
@@ -53,7 +50,7 @@ namespace Uralstech.AvLoader.PostProcessors
                         continue;
 
                     Material target = new(overrideDefinition.Target);
-                    avatar.DestroyOnDispose.Add(target);
+                    avatar.RegisterLifetimeObject(target);
 
                     ApplyProperties(overrideDefinition.PropertyMappings, source, target);
 

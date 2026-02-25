@@ -12,7 +12,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.26",
+      "version": "1.8.27",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -152,7 +152,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.8.9",
+      "version": "1.8.10",
       "depth": 1,
       "source": "registry",
       "dependencies": {
