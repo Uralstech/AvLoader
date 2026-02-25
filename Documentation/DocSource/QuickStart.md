@@ -157,3 +157,23 @@ avatar.Dispose();  // Destroys GameObject, renders, post-processor created mater
 For full API docs, please see <https://uralstech.github.io/AvLoader/api/Uralstech.AvLoader.html> or `APIReferenceManual.pdf` in the package documentation for the reference manual.
 
 You can implement `IAvDataLoader` or `IAvImporter` for custom sources/importers (e.g., cloud APIs, FBX import).
+
+## Advanced - Capabilities
+
+Capabilities are interfaces in the `Uralstech.AvLoader.Capabilities` namespace for `LoadedAv` that expose functionality
+guaranteed to exist because a the avatar importer created it, independent of later configuration or user modifications.
+
+They act as a reliable contract so consuming code can safely detect and use importer-provided features, such as VRM LookAt, VRM Expressions, or an
+importer-generated Animator, without guessing or inspecting arbitrary components. Capabilities describe availability and guarantees only, not ownership,
+configuration, or policy, and they are implemented exclusively by importer-backed `LoadedAv` objects, never by post-processors or user code.
+
+**Capabilities should *not* be accessed by using inferface methods directly, but by casting the `LoadedAv` object to the interface.**
+You can also use the utility methods defined in `LoadedAv` for doing so:
+```csharp
+LoadedAv avatar = ...
+if (!avatar.TryGetCapability(out IBlendShapeProvider? provider))
+    return;
+
+if (provider.HasWeight("blink"))
+    provider.SetWeight("blink", 1f); // Close the avatar's eyes.
+```
