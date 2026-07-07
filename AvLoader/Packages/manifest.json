@@ -2,10 +2,11 @@
   "dependencies": {
     "com.unity.animation.rigging": "1.4.1",
     "com.unity.cloud.gltfast": "6.15.1",
-    "com.unity.ide.visualstudio": "2.0.26",
-    "com.unity.render-pipelines.universal": "17.3.0",
-    "com.vrmc.gltf": "0.131.0",
-    "com.vrmc.vrm": "0.131.0",
+    "com.unity.ide.rider": "3.0.40",
+    "com.unity.ide.visualstudio": "2.0.27",
+    "com.unity.render-pipelines.universal": "17.4.0",
+    "com.vrmc.gltf": "0.131.1",
+    "com.vrmc.vrm": "0.131.1",
     "com.unity.modules.animation": "1.0.0",
     "com.unity.modules.uielements": "1.0.0"
   },
