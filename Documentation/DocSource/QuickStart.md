@@ -9,7 +9,7 @@ If you've just updated the package, it is recommended to check the [*changelogs*
 
 ## Prerequisites
 
-- Unity Version: Unity 6.0+ (tested on Unity 6.3).
+- Unity Version: Unity 6.0+
 - Importer Dependencies (Install at least one):
   - [glTFast](https://docs.unity3d.com/Packages/com.unity.cloud.gltfast@6.15/manual/index.html) for GLTF/GLB support.
   - [UniGLTF](https://github.com/vrm-c/UniVRM) for alternative GLTF/GLB support.

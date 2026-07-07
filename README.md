@@ -7,7 +7,7 @@ Unity framework for loading 3D avatars of different formats and sources at runti
 
 ## Installation
 
-This package was designed for Unity 6.0 and above. Built and tested in Unity 6.3.
+This package was designed for Unity 6.0 and above. Built and tested in Unity 6.4.
 
 ### OpenUPM
 
