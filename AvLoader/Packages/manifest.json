@@ -4,11 +4,10 @@
     "com.unity.cloud.gltfast": "6.15.1",
     "com.unity.ide.rider": "3.0.40",
     "com.unity.ide.visualstudio": "2.0.27",
-    "com.unity.render-pipelines.universal": "17.4.0",
+    "com.unity.render-pipelines.universal": "17.5.0",
     "com.vrmc.gltf": "0.131.1",
-    "com.vrmc.vrm": "0.131.1",
-    "com.unity.modules.animation": "1.0.0",
-    "com.unity.modules.uielements": "1.0.0"
+    "com.vrmc.vrm": "0.131.2",
+    "com.unity.modules.animation": "1.0.0"
   },
   "scopedRegistries": [
     {

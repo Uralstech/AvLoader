@@ -18,7 +18,10 @@ using System.Collections.Generic;
 #nullable enable
 namespace Uralstech.AvLoader.Utils
 {
-    /// yeah this is a mess
+    // yeah this is a mess
+#if UNITY_6000_5_OR_NEWER
+    [Unity.Scripting.LifecycleManagement.NoAutoStaticsCleanup]
+#endif
     internal static class IOUtils
     {
         internal const string DefaultModelFile = "model";
@@ -26,14 +29,12 @@ namespace Uralstech.AvLoader.Utils
         internal const string DefaultBustRenderFile = "bust";
         internal const string DefaultFullRenderFile = "full";
 
-        internal static readonly KeyValuePair<string, AvModelFileExtension>[] s_gltfStringAndModelFileExtensionPairs = new KeyValuePair<string, AvModelFileExtension>[]
-        {
+        internal static readonly KeyValuePair<string, AvModelFileExtension>[] s_gltfStringAndModelFileExtensionPairs = {
             new(".glb", AvModelFileExtension.GLB),
             new(".gltf", AvModelFileExtension.GLTF),
         };
 
-        internal static readonly KeyValuePair<string, AvImageFileExtension>[] s_jpegStringAndImageFileExtensionPairs = new KeyValuePair<string, AvImageFileExtension>[]
-        {
+        internal static readonly KeyValuePair<string, AvImageFileExtension>[] s_jpegStringAndImageFileExtensionPairs = {
             new(".jpeg", AvImageFileExtension.JPEG),
             new(".jpg", AvImageFileExtension.JPG),
         };
